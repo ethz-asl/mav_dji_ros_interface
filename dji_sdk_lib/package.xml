@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dji_sdk_lib</name>
+  <version>0.1.9</version>
+  <description>The dji_sdk_lib package</description>
+
+
+  <maintainer email="william.wu@dji.com">William Wu</maintainer>
+  <maintainer email="norman.li@dji.com">Norman Li</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+</package>
