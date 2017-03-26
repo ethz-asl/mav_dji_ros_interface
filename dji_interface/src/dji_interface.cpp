@@ -118,8 +118,8 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   ROS_INFO_STREAM_ONCE(kScreenPrefix + "Received first roll pitch yawrate thrust command msg");
 
   double roll_cmd = msg->roll*180.0/M_PI;
-  double pitch_cmd = msg->pitch*180.0/M_PI;
-  double yaw_rate_cmd = msg->yaw_rate*180.0/M_PI;
+  double pitch_cmd = -msg->pitch*180.0/M_PI;
+  double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
   double throttle_cmd = msg->thrust.z*thrust_constant_;
 
   // zero thrust_cmd will shut off the motors.
@@ -311,13 +311,13 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
 
   msg.axes.resize(8);
   // axis 0 is pitch
-  msg.axes[0] = data.rc.pitch / kRCStickMaxValue;
+  msg.axes[0] = -data.rc.pitch / kRCStickMaxValue;
   // axis 1 is roll
-  msg.axes[1] = data.rc.roll / kRCStickMaxValue;
+  msg.axes[1] = -data.rc.roll / kRCStickMaxValue;
   // axis 2 is thrust
   msg.axes[2] = data.rc.throttle / kRCStickMaxValue;
   //axis 3 is yaw
-  msg.axes[3] = data.rc.yaw / kRCStickMaxValue;
+  msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
   if (data.rc.gear < -kRCStickMaxValue / 2) {
     msg.axes[4] = 1;
