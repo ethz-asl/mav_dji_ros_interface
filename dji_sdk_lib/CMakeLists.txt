@@ -5,6 +5,8 @@ find_package(catkin REQUIRED)
 find_package(catkin_simple REQUIRED)
 catkin_simple()
 
+add_definitions(-fPIC)
+
 set(CMAKE_BUILD_TYPE Release)
 add_definitions(-std=c++11)
 
