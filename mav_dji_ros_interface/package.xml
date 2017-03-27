@@ -11,5 +11,7 @@
   <buildtool_depend>catkin_simple</buildtool_depend>
 
   <depend>dji_sdk_lib</depend>
+  <depend>dji_comm</depend>
+  <depend>dji_interface</depend>
 
 </package>
