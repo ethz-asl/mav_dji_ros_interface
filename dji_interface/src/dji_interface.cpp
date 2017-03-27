@@ -81,6 +81,70 @@ void DJIInterface::loadParameters()
     ROS_ERROR_STREAM(kScreenPrefix + "Unknown drone version");
     abort();
   }
+
+  // load packets freq
+  int imu_update_rate;
+  int gps_updae_rate;
+  int time_stamp_update_rate;
+  int magnetometer_update_rate;
+  int rc_update_rate;
+  int status_update_rate;
+
+  private_nh_.param<int>("imu_update_rate", imu_update_rate, DJI::onboardSDK::BROADCAST_FREQ_100HZ);
+  private_nh_.param<int>("gps_updae_rate", gps_updae_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("time_stamp_update_rate", time_stamp_update_rate, DJI::onboardSDK::BROADCAST_FREQ_1HZ);
+  private_nh_.param<int>("magnetometer_update_rate", magnetometer_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("rc_update_rate", rc_update_rate, DJI::onboardSDK::BROADCAST_FREQ_50HZ);
+  private_nh_.param<int>("status_update_rate", status_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+
+  uint8_t freq[16] = {DJI::onboardSDK::BROADCAST_FREQ_0HZ};
+
+  if (drone_version_ == "M100") {
+    // M100
+
+    //timestamp
+    freq[0] = getFrequencyValue(time_stamp_update_rate);
+    //IMU
+    freq[1] = getFrequencyValue(imu_update_rate);
+    freq[2] = getFrequencyValue(imu_update_rate);
+    freq[3] = getFrequencyValue(imu_update_rate);
+    freq[4] = getFrequencyValue(imu_update_rate);
+    //GPS
+    freq[5] = getFrequencyValue(gps_updae_rate);
+    //magnetometer
+    freq[6] = getFrequencyValue(magnetometer_update_rate);
+    //rc data
+    freq[7] = getFrequencyValue(rc_update_rate);
+    //status
+    freq[9] = getFrequencyValue(status_update_rate);
+    freq[10] = getFrequencyValue(status_update_rate);
+    freq[11] = getFrequencyValue(status_update_rate);
+  } else {
+    // A3
+
+    //timestamp
+    freq[0] = getFrequencyValue(time_stamp_update_rate);
+    //IMU
+    freq[1] = getFrequencyValue(imu_update_rate);
+    freq[2] = getFrequencyValue(imu_update_rate);
+    freq[3] = getFrequencyValue(imu_update_rate);
+    freq[4] = getFrequencyValue(imu_update_rate);
+    //GPS
+    freq[5] = getFrequencyValue(gps_updae_rate);
+    freq[6] = getFrequencyValue(gps_updae_rate);
+    freq[7] = getFrequencyValue(gps_updae_rate);
+    //magnetometer
+    freq[8] = getFrequencyValue(magnetometer_update_rate);
+    //rc data
+    freq[9] = getFrequencyValue(rc_update_rate);
+    //status
+    freq[11] = getFrequencyValue(status_update_rate);
+    freq[12] = getFrequencyValue(status_update_rate);
+    freq[13] = getFrequencyValue(status_update_rate);
+  }
+
+  dji_comm_.setBroadcastFrequency(freq);
+
   ROS_INFO("parameters loaded correctly");
 }
 
@@ -398,6 +462,25 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
   if (!rc_serial_enabled & external_control_mode) {
     dji_comm_.setExternalControl(false);
   }
+}
+
+int DJIInterface::getFrequencyValue(int freq_hz)
+{
+switch (freq_hz) {
+  case (0):
+    return 0;
+  case (1):
+    return 1;
+  case (10):
+    return 2;
+  case (50):
+    return 3;
+  case (100):
+    return 4;
+  default:
+    ROS_WARN_STREAM(kScreenPrefix + "Unacceptable frequency value. Acceptable values are 0, 1, 10, 50, 100 Hz.");
+    return 5;
+}
 }
 
 } /* namespace mav_disturbance_observer */
