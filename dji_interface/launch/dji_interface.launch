@@ -3,10 +3,7 @@
   <arg name="namespace" default="$(arg mav_name)"/>
   <group ns="$(arg namespace)">
     <node name="dji_interface" pkg="dji_interface" type="dji_interface_node" respawn="true" clear_params="true" output="screen">
-      <rosparam file="$(find dji_interface)/cfg/params.yaml" />
-      <param name="device" value="/dev/tty.usbserial-AI02B86I"/>
-      <param name="app_id" type="int" value="1027253"/>
-      <param name="enc_key" type="string" value="2267d8cc7874b641a2d16798afb659ba4876b5dfd9b0a0e471c00e188b5c9ed3"/>
+      <rosparam file="$(find dji_interface)/cfg/params.yaml"/>
     </node>
   </group>
 </launch>
