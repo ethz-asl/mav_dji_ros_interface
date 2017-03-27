@@ -394,8 +394,8 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
     }
   }
 
-  // if serial is disabled, no external control
-  if (!rc_serial_enabled) {
+  // if serial is disabled and external control is enabled, no external control
+  if (!rc_serial_enabled & external_control_mode) {
     dji_comm_.setExternalControl(false);
   }
 }
