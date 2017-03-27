@@ -94,6 +94,8 @@ class DJIComm
   void setExternalControl(bool enable);
   //set roll pitch yawrate thrust
   void setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust);
+  //set broadcast freq
+  void setBroadcastFrequency(uint8_t* freq);
 
  private:
   //ros
