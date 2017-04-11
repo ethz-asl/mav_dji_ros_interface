@@ -103,7 +103,10 @@ void DJIComm::setExternalControl(bool enable){
 }
 
 void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust){
+  ros::WallTime t1 = ros::WallTime::now();
   flight_ptr_->setMovementControl(0x2A, roll_cmd, pitch_cmd, thrust, yaw_rate);
+  ros::WallTime t2 = ros::WallTime::now();
+  std::cout << "dt: " << (t2 - t1).toSec() << std::endl;
 }
 
 void DJIComm::setBroadcastFrequency(uint8_t* freq){

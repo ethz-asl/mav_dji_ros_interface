@@ -1,4 +1,5 @@
-device: "/dev/tty.usbserial-AI02B86I"
+#device: "/dev/tty.usbserial-AI02B86I"
+device: "/dev/ttyUSB0"
 app_id: 1027253
 enc_key: "2267d8cc7874b641a2d16798afb659ba4876b5dfd9b0a0e471c00e188b5c9ed3"
 
