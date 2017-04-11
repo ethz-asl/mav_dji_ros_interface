@@ -34,33 +34,34 @@ const std::string DJIInterface::kScreenPrefix = "[dji interface]: ";
 constexpr double DJIInterface::kAngularVelocityNoiseVariance;
 constexpr double DJIInterface::kLinearAccelerationNoiseVariance;
 
-DJIInterface::DJIInterface(const ros::NodeHandle& nh,
-                           const ros::NodeHandle& private_nh)
+DJIInterface::DJIInterface(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
     : nh_(nh),
       private_nh_(private_nh),
       dji_comm_(nh, private_nh),
       thrust_constant_(kDefaultThrustConstant),
-      initialized_(false) {
+      initialized_(false)
+{
   loadParameters();
   init();
 }
 
-DJIInterface::~DJIInterface() {}
+DJIInterface::~DJIInterface()
+{
+}
 
-void DJIInterface::loadParameters() {
+void DJIInterface::loadParameters()
+{
   private_nh_.param<std::string>("frame_id", frame_id_, "dji_interface");
   private_nh_.param<std::string>("device", device_, "/dev/ttyUSB0");
-  private_nh_.param<double>("thrust_constant", thrust_constant_,
-                            thrust_constant_);
+  private_nh_.param<double>("thrust_constant", thrust_constant_, thrust_constant_);
   std::cout << "device: " << device_ << std::endl;
   private_nh_.param<int>("baudrate", baudrate_, 921600);
   int app_id;
   private_nh_.param<int>("app_id", app_id, 1022384);
   activation_data_.ID = app_id;
   std::string enc_key;
-  private_nh_.param<std::string>(
-      "enc_key", enc_key,
-      "e7bad64696529559318bb35d0a8c6050d3b88e791e1808cfe8f7802150ee6f0d");
+  private_nh_.param<std::string>("enc_key", enc_key,
+                                 "e7bad64696529559318bb35d0a8c6050d3b88e791e1808cfe8f7802150ee6f0d");
 
   char key[65];
   activation_data_.encKey = key;
@@ -88,22 +89,15 @@ void DJIInterface::loadParameters() {
   int rc_update_rate;
   int status_update_rate;
 
-  private_nh_.param<int>("imu_update_rate", imu_update_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_100HZ);
-  private_nh_.param<int>("gps_updae_rate", gps_updae_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_10HZ);
-  private_nh_.param<int>("time_stamp_update_rate", time_stamp_update_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_1HZ);
-  private_nh_.param<int>("magnetometer_update_rate", magnetometer_update_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_10HZ);
-  private_nh_.param<int>("rc_update_rate", rc_update_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_50HZ);
-  private_nh_.param<int>("status_update_rate", status_update_rate,
-                         DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("imu_update_rate", imu_update_rate, DJI::onboardSDK::BROADCAST_FREQ_100HZ);
+  private_nh_.param<int>("gps_updae_rate", gps_updae_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("time_stamp_update_rate", time_stamp_update_rate, DJI::onboardSDK::BROADCAST_FREQ_1HZ);
+  private_nh_.param<int>("magnetometer_update_rate", magnetometer_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("rc_update_rate", rc_update_rate, DJI::onboardSDK::BROADCAST_FREQ_50HZ);
+  private_nh_.param<int>("status_update_rate", status_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
 
   //  = {DJI::onboardSDK::BROADCAST_FREQ_0HZ};
-  broadcast_frequency_.resize(kBroadcastFrequencySize,
-                              DJI::onboardSDK::BROADCAST_FREQ_0HZ);
+  broadcast_frequency_.resize(kBroadcastFrequencySize, DJI::onboardSDK::BROADCAST_FREQ_0HZ);
 
   if (drone_version_ == "M100") {
     // M100
@@ -152,7 +146,8 @@ void DJIInterface::loadParameters() {
   ROS_INFO("parameters loaded correctly");
 }
 
-void DJIInterface::init() {
+void DJIInterface::init()
+{
   dji_comm_.init(device_, baudrate_);
   dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.getFirmwareVersion(&firmware_version_);
@@ -164,27 +159,26 @@ void DJIInterface::init() {
   initialized_ = true;
 }
 
-void DJIInterface::setPublishers() {
+void DJIInterface::setPublishers()
+{
   imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 10);
   rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 10);
-  status_pub_ =
-      nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 10);
+  status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 10);
 }
 
-void DJIInterface::setSubscribers() {
-  command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(
-      mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
-      &DJIInterface::commandRollPitchYawrateThrustCallback, this);
+void DJIInterface::setSubscribers()
+{
+  command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
+                                                         &DJIInterface::commandRollPitchYawrateThrustCallback, this);
 }
 
-void DJIInterface::commandRollPitchYawrateThrustCallback(
-    const mav_msgs::RollPitchYawrateThrustConstPtr& msg) {
+void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg)
+{
   if (!initialized_) {
     return;
   }
 
-  ROS_INFO_STREAM_ONCE(kScreenPrefix +
-                       "Received first roll pitch yawrate thrust command msg");
+  ROS_INFO_STREAM_ONCE(kScreenPrefix + "Received first roll pitch yawrate thrust command msg");
 
   double roll_cmd = msg->roll * 180.0 / M_PI;
   double pitch_cmd = -msg->pitch * 180.0 / M_PI;
@@ -193,16 +187,15 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(
 
   // zero thrust_cmd will shut off the motors.
   if (throttle_cmd <= 0) {
-    ROS_WARN_STREAM(kScreenPrefix +
-                    "Throttle command is negative.. set to minimum");
+    ROS_WARN_STREAM(kScreenPrefix + "Throttle command is negative.. set to minimum");
     throttle_cmd = 5;
   }
 
-  dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd,
-                                      throttle_cmd);
+  dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd, throttle_cmd);
 }
 
-void DJIInterface::broadcastCallback() {
+void DJIInterface::broadcastCallback()
+{
   if (!initialized_) {
     return;
   }
@@ -220,13 +213,13 @@ void DJIInterface::broadcastCallback() {
   updateControlMode(data);
 }
 
-bool DJIInterface::checkNewData(FlightDataType data_type,
-                                const unsigned short msg_flag) {
-  bool version_A3 = firmware_version_ == DJI::onboardSDK::versionA3_31 ||
-                    firmware_version_ == DJI::onboardSDK::versionA3_32;
+bool DJIInterface::checkNewData(FlightDataType data_type, const unsigned short msg_flag)
+{
+  bool version_A3 = firmware_version_ == DJI::onboardSDK::versionA3_31
+      || firmware_version_ == DJI::onboardSDK::versionA3_32;
 
-  bool version_M100 = firmware_version_ == DJI::onboardSDK::versionM100_31 ||
-                      firmware_version_ == DJI::onboardSDK::versionM100_23;
+  bool version_M100 = firmware_version_ == DJI::onboardSDK::versionM100_31
+      || firmware_version_ == DJI::onboardSDK::versionM100_23;
 
   if (version_A3) {
     switch (data_type) {
@@ -319,7 +312,8 @@ bool DJIInterface::checkNewData(FlightDataType data_type,
 }
 
 // process data
-void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data) {
+void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data)
+{
   if (!checkNewData(FlightDataType::IMU, data.dataFlag)) {
     // no new imu data
     return;
@@ -332,9 +326,8 @@ void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data) {
 
   // transform attitude from NED to ENU
   Eigen::Quaterniond q_NED(data.q.q0, data.q.q1, data.q.q2, data.q.q3);
-  Eigen::Quaterniond q_ENU =
-      Eigen::Quaterniond(0, 1.0 / sqrt(2.0), 1.0 / sqrt(2.0), 0) * q_NED *
-      Eigen::Quaterniond(0, 1, 0, 0);
+  Eigen::Quaterniond q_ENU = Eigen::Quaterniond(0, 1.0 / sqrt(2.0), 1.0 / sqrt(2.0), 0) * q_NED
+      * Eigen::Quaterniond(0, 1, 0, 0);
 
   msg.orientation.w = q_ENU.w();
   msg.orientation.x = q_ENU.x();
@@ -365,7 +358,8 @@ void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data) {
   imu_pub_.publish(msg);
 }
 
-void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data) {
+void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
+{
   if (!checkNewData(FlightDataType::RCData, data.dataFlag)) {
     // no new RC data
     return;
@@ -412,15 +406,15 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data) {
 
   rc_pub_.publish(msg);
 }
-void DJIInterface::processTimeStamp(
-    const DJI::onboardSDK::BroadcastData& data) {
+void DJIInterface::processTimeStamp(const DJI::onboardSDK::BroadcastData& data)
+{
   if (!checkNewData(FlightDataType::TimeStamp, data.dataFlag)) {
     // no new timestamp data
     return;
   }
 }
-void DJIInterface::processStatusInfo(
-    const DJI::onboardSDK::BroadcastData& data) {
+void DJIInterface::processStatusInfo(const DJI::onboardSDK::BroadcastData& data)
+{
   if (!checkNewData(FlightDataType::Status, data.dataFlag)) {
     // no new battery info data
     return;
@@ -436,8 +430,8 @@ void DJIInterface::processStatusInfo(
   status_pub_.publish(msg);
 }
 
-void DJIInterface::updateControlMode(
-    const DJI::onboardSDK::BroadcastData& data) {
+void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
+{
   // need control status and RC data
   if (!checkNewData(FlightDataType::Status, data.dataFlag)) {
     return;
@@ -466,7 +460,8 @@ void DJIInterface::updateControlMode(
   }
 }
 
-int DJIInterface::getFrequencyValue(int freq_hz) {
+int DJIInterface::getFrequencyValue(int freq_hz)
+{
   switch (freq_hz) {
     case (0):
       return 0;
@@ -479,9 +474,8 @@ int DJIInterface::getFrequencyValue(int freq_hz) {
     case (100):
       return 4;
     default:
-      ROS_WARN_STREAM(kScreenPrefix +
-                      "Unacceptable frequency value. Acceptable values are 0, "
-                      "1, 10, 50, 100 Hz.");
+      ROS_WARN_STREAM(kScreenPrefix + "Unacceptable frequency value. Acceptable values are 0, "
+          "1, 10, 50, 100 Hz.");
       return 5;
   }
 }

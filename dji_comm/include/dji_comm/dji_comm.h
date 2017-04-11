@@ -48,44 +48,44 @@
 
 namespace dji_comm {
 
-class DJIComm {
+class DJIComm
+{
  public:
   DJIComm(const ros::NodeHandle &nh, const ros::NodeHandle &private_nh);
   ~DJIComm();
 
   void init(std::string device, unsigned int baudrate);
 
-  template <class T>
-  void setBroadcastCallback(void (T::*func)(), T *obj) {
+  template<class T>
+  void setBroadcastCallback(void (T::*func)(), T *obj)
+  {
     broadcast_callback_ = std::bind(func, obj);
     core_api_ptr_->setBroadcastCallback(&DJIComm::broadcastCallback, this);
     printf("Broadcast call back received \n");
   }
 
-  template <class T>
-  void setFromMobileCallback(void (T::*func)(uint8_t *, uint8_t), T *obj) {
-    mobile_callback_ =
-        std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
+  template<class T>
+  void setFromMobileCallback(void (T::*func)(uint8_t *, uint8_t), T *obj)
+  {
+    mobile_callback_ = std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
     core_api_ptr_->setFromMobileCallback(&DJIComm::fromMobileCallback, this);
   }
 
-  template <class T>
-  void setMissionStatusCallback(void (T::*func)(uint8_t *, uint8_t), T *obj) {
-    mission_status_callback_ =
-        std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
+  template<class T>
+  void setMissionStatusCallback(void (T::*func)(uint8_t *, uint8_t), T *obj)
+  {
+    mission_status_callback_ = std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
     core_api_ptr_->setWayPointCallback(&DJIComm::missionStatusCallback, this);
   }
 
-  template <class T>
-  void setMissionEventCallback(void (T::*func)(uint8_t *, uint8_t), T *obj) {
-    mission_event_callback_ =
-        std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
-    core_api_ptr_->setWayPointEventCallback(&DJIComm::missionEventCallback,
-                                            this);
+  template<class T>
+  void setMissionEventCallback(void (T::*func)(uint8_t *, uint8_t), T *obj)
+  {
+    mission_event_callback_ = std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
+    core_api_ptr_->setWayPointEventCallback(&DJIComm::missionEventCallback, this);
   }
 
-  void activate(DJI::onboardSDK::ActivateData *data,
-                DJI::onboardSDK::CallBack callback);
+  void activate(DJI::onboardSDK::ActivateData *data, DJI::onboardSDK::CallBack callback);
 
   void getBroadcastData(DJI::onboardSDK::BroadcastData *data);
   void getFirmwareVersion(DJI::onboardSDK::Version *firmware_version);
@@ -93,8 +93,7 @@ class DJIComm {
   // enable external control
   void setExternalControl(bool enable);
   // set roll pitch yawrate thrust
-  void setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd,
-                                 double yaw_rate, double thrust);
+  void setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust);
   // set broadcast freq
   void setBroadcastFrequency(uint8_t *freq);
 
@@ -121,18 +120,10 @@ class DJIComm {
   std::shared_ptr<DJI::onboardSDK::HotPoint> hot_point_ptr_;
   std::shared_ptr<DJI::onboardSDK::Follow> follow_ptr_;
 
-  static void broadcastCallback(DJI::onboardSDK::CoreAPI *coreAPI,
-                                DJI::onboardSDK::Header *header,
-                                void *userData);
-  static void fromMobileCallback(DJI::onboardSDK::CoreAPI *coreAPI,
-                                 DJI::onboardSDK::Header *header,
-                                 void *userData);
-  static void missionStatusCallback(DJI::onboardSDK::CoreAPI *coreAPI,
-                                    DJI::onboardSDK::Header *header,
-                                    void *userData);
-  static void missionEventCallback(DJI::onboardSDK::CoreAPI *coreAPI,
-                                   DJI::onboardSDK::Header *header,
-                                   void *userData);
+  static void broadcastCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
+  static void fromMobileCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
+  static void missionStatusCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
+  static void missionEventCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
 
   static void *mainCommunicationThread(void *core_api);
 };

@@ -50,7 +50,8 @@ namespace dji_comm {
 #define B921600 921600
 #endif
 
-class DJISerialPort : public DJI::onboardSDK::HardDriver {
+class DJISerialPort : public DJI::onboardSDK::HardDriver
+{
  public:
   DJISerialPort(std::string device, unsigned int baudrate);
   ~DJISerialPort();
@@ -94,8 +95,7 @@ class DJISerialPort : public DJI::onboardSDK::HardDriver {
   bool openSerial(const char *dev);
   bool closeSerial();
   bool flushSerial();
-  bool configSerial(int baudrate, char data_bits, char parity_bits,
-                    char stop_bits);
+  bool configSerial(int baudrate, char data_bits, char parity_bits, char stop_bits);
   int startSerial(const char *dev_name, int baud_rate);
   int writeSerial(const unsigned char *buf, int len);
   int readSerial(unsigned char *buf, int len);
