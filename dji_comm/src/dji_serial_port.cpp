@@ -52,7 +52,8 @@ DJISerialPort::~DJISerialPort()
 
 void DJISerialPort::init()
 {
-//  API_LOG(this, STATUS_LOG, "Open serial device %s with baudrate %u...\n", device_.c_str(), baudrate_);
+  //  API_LOG(this, STATUS_LOG, "Open serial device %s with baudrate %u...\n",
+  //  device_.c_str(), baudrate_);
   if (startSerial(device_.c_str(), baudrate_) < 0) {
     closeSerial();
     API_LOG(this, ERROR_LOG, "Failed to start serial device\n");
@@ -162,7 +163,7 @@ void DJISerialPort::notify()
 
 // serial port low level stuff
 
-bool DJISerialPort::openSerial(const char* dev)
+bool DJISerialPort::openSerial(const char *dev)
 {
   serial_fd_ = open(dev, O_RDWR | O_NONBLOCK);
   if (serial_fd_ < 0) {
@@ -192,7 +193,8 @@ bool DJISerialPort::flushSerial()
 
 bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits, char stop_bits)
 {
-  int st_baud[] = { B4800, B9600, B19200, B38400, B57600, B115200, B230400, B921600 };
+  int st_baud[] = { B4800, B9600, B19200, B38400,
+  B57600, B115200, B230400, B921600 };
   int std_rate[] = { 4800, 9600, 19200, 38400, 57600, 115200, 230400, 921600 };
 
   int i, j;
@@ -281,11 +283,9 @@ int DJISerialPort::startSerial(const char *dev_name, int baud_rate)
     ptemp = dev_name;
   }
   if (true == openSerial(ptemp) && true == configSerial(baud_rate, 8, 'N', 1)) {
-
     FD_ZERO(&serial_fd_set_);
     FD_SET(serial_fd_, &serial_fd_set_);
     return serial_fd_;
-
   }
   return -1;
 }

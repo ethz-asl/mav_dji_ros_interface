@@ -30,16 +30,14 @@
 
 namespace dji_comm {
 
-DJIComm::DJIComm(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh):
-    nh_(nh),
-    private_nh_(private_nh)
+DJIComm::DJIComm(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
+    : nh_(nh),
+      private_nh_(private_nh)
 {
-
 }
 
 DJIComm::~DJIComm()
 {
-
 }
 
 void DJIComm::init(std::string device, unsigned int baudrate)
@@ -57,10 +55,10 @@ void DJIComm::init(std::string device, unsigned int baudrate)
   hot_point_ptr_.reset(new DJI::onboardSDK::HotPoint(core_api_ptr_.get()));
   follow_ptr_.reset(new DJI::onboardSDK::Follow(core_api_ptr_.get()));
 
-  int ret = pthread_create(&communication_thread_, 0, mainCommunicationThread, (void *)core_api_ptr_.get());
-  if (0 != ret){
+  int ret = pthread_create(&communication_thread_, 0, mainCommunicationThread, (void*) core_api_ptr_.get());
+  if (0 != ret) {
     ROS_FATAL("Cannot create new thread for readPoll!");
-  }else{
+  } else {
     ROS_INFO("Succeed to create thread for readPoll");
   }
 
@@ -74,22 +72,27 @@ void DJIComm::init(std::string device, unsigned int baudrate)
   printf("==============\n");
 }
 
-void DJIComm::activate(DJI::onboardSDK::ActivateData *data, DJI::onboardSDK::CallBack callback){
+void DJIComm::activate(DJI::onboardSDK::ActivateData* data, DJI::onboardSDK::CallBack callback)
+{
   core_api_ptr_->activate(data, callback);
 }
 
-void DJIComm::getBroadcastData(DJI::onboardSDK::BroadcastData* data){
+void DJIComm::getBroadcastData(DJI::onboardSDK::BroadcastData* data)
+{
   *data = core_api_ptr_->getBroadcastData();
 }
-void DJIComm::getFirmwareVersion(DJI::onboardSDK::Version* firmware_version){
+void DJIComm::getFirmwareVersion(DJI::onboardSDK::Version* firmware_version)
+{
   *firmware_version = core_api_ptr_->getFwVersion();
 }
 
-void DJIComm::broadcastCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData){
-  ( (DJIComm*)userData )->broadcast_callback_();
+void DJIComm::broadcastCallback(DJI::onboardSDK::CoreAPI* coreAPI, DJI::onboardSDK::Header* header, void* userData)
+{
+  ((DJIComm*) userData)->broadcast_callback_();
 }
 
-void* DJIComm::mainCommunicationThread(void* core_api){
+void* DJIComm::mainCommunicationThread(void* core_api)
+{
   DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
   while (ros::ok()) {
     p_coreAPI->readPoll();
@@ -98,15 +101,18 @@ void* DJIComm::mainCommunicationThread(void* core_api){
   }
 }
 
-void DJIComm::setExternalControl(bool enable){
+void DJIComm::setExternalControl(bool enable)
+{
   core_api_ptr_->setControl(enable);
 }
 
-void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust){
+void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust)
+{
   flight_ptr_->setMovementControl(0x2A, roll_cmd, pitch_cmd, thrust, yaw_rate);
 }
 
-void DJIComm::setBroadcastFrequency(uint8_t* freq){
+void DJIComm::setBroadcastFrequency(uint8_t* freq)
+{
   core_api_ptr_->setBroadcastFreq(freq);
 }
 

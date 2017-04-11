@@ -29,20 +29,20 @@
 #ifndef SRC_DJI_COMM_H_
 #define SRC_DJI_COMM_H_
 
-#include <stdlib.h>
-#include <string>
 #include <pthread.h>
+#include <stdlib.h>
 #include <functional>
+#include <string>
 
 #include <ros/ros.h>
 
 #include <dji_sdk_lib/DJI_API.h>
-#include <dji_sdk_lib/DJI_Flight.h>
 #include <dji_sdk_lib/DJI_Camera.h>
+#include <dji_sdk_lib/DJI_Flight.h>
+#include <dji_sdk_lib/DJI_Follow.h>
+#include <dji_sdk_lib/DJI_HotPoint.h>
 #include <dji_sdk_lib/DJI_VirtualRC.h>
 #include <dji_sdk_lib/DJI_WayPoint.h>
-#include <dji_sdk_lib/DJI_HotPoint.h>
-#include <dji_sdk_lib/DJI_Follow.h>
 
 #include "dji_comm/dji_serial_port.h"
 
@@ -51,7 +51,7 @@ namespace dji_comm {
 class DJIComm
 {
  public:
-  DJIComm(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
+  DJIComm(const ros::NodeHandle &nh, const ros::NodeHandle &private_nh);
   ~DJIComm();
 
   void init(std::string device, unsigned int baudrate);
@@ -87,18 +87,18 @@ class DJIComm
 
   void activate(DJI::onboardSDK::ActivateData *data, DJI::onboardSDK::CallBack callback);
 
-  void getBroadcastData(DJI::onboardSDK::BroadcastData* data);
-  void getFirmwareVersion(DJI::onboardSDK::Version* firmware_version);
+  void getBroadcastData(DJI::onboardSDK::BroadcastData *data);
+  void getFirmwareVersion(DJI::onboardSDK::Version *firmware_version);
 
-  //enable external control
+  // enable external control
   void setExternalControl(bool enable);
-  //set roll pitch yawrate thrust
+  // set roll pitch yawrate thrust
   void setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust);
-  //set broadcast freq
-  void setBroadcastFrequency(uint8_t* freq);
+  // set broadcast freq
+  void setBroadcastFrequency(uint8_t *freq);
 
  private:
-  //ros
+  // ros
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
 
@@ -107,11 +107,11 @@ class DJIComm
 
   // callbacks
   std::function<void()> broadcast_callback_;
-  std::function<void(uint8_t*, uint8_t)> mobile_callback_;
-  std::function<void(uint8_t*, uint8_t)> mission_status_callback_;
-  std::function<void(uint8_t*, uint8_t)> mission_event_callback_;
+  std::function<void(uint8_t *, uint8_t)> mobile_callback_;
+  std::function<void(uint8_t *, uint8_t)> mission_status_callback_;
+  std::function<void(uint8_t *, uint8_t)> mission_event_callback_;
 
-  //api
+  // api
   std::shared_ptr<DJI::onboardSDK::CoreAPI> core_api_ptr_;
   std::shared_ptr<DJI::onboardSDK::Flight> flight_ptr_;
   std::shared_ptr<DJI::onboardSDK::Camera> camera_ptr_;
@@ -125,8 +125,7 @@ class DJIComm
   static void missionStatusCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
   static void missionEventCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
 
-  static void* mainCommunicationThread(void* core_api);
-
+  static void *mainCommunicationThread(void *core_api);
 };
 
 } /* namespace dji_comm */

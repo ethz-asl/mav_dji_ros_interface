@@ -47,7 +47,6 @@ DJIInterface::DJIInterface(const ros::NodeHandle& nh, const ros::NodeHandle& pri
 
 DJIInterface::~DJIInterface()
 {
-
 }
 
 void DJIInterface::loadParameters()
@@ -103,42 +102,42 @@ void DJIInterface::loadParameters()
   if (drone_version_ == "M100") {
     // M100
 
-    //timestamp
+    // timestamp
     broadcast_frequency_[0] = getFrequencyValue(time_stamp_update_rate);
-    //IMU
+    // IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
-    //GPS
+    // GPS
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
-    //magnetometer
+    // magnetometer
     broadcast_frequency_[6] = getFrequencyValue(magnetometer_update_rate);
-    //rc data
+    // rc data
     broadcast_frequency_[7] = getFrequencyValue(rc_update_rate);
-    //status
+    // status
     broadcast_frequency_[9] = getFrequencyValue(status_update_rate);
     broadcast_frequency_[10] = getFrequencyValue(status_update_rate);
     broadcast_frequency_[11] = getFrequencyValue(status_update_rate);
   } else {
     // A3
 
-    //timestamp
+    // timestamp
     broadcast_frequency_[0] = getFrequencyValue(time_stamp_update_rate);
-    //IMU
+    // IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
-    //GPS
+    // GPS
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[6] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[7] = getFrequencyValue(gps_updae_rate);
-    //magnetometer
+    // magnetometer
     broadcast_frequency_[8] = getFrequencyValue(magnetometer_update_rate);
-    //rc data
+    // rc data
     broadcast_frequency_[9] = getFrequencyValue(rc_update_rate);
-    //status
+    // status
     broadcast_frequency_[11] = getFrequencyValue(status_update_rate);
     broadcast_frequency_[12] = getFrequencyValue(status_update_rate);
     broadcast_frequency_[13] = getFrequencyValue(status_update_rate);
@@ -175,19 +174,19 @@ void DJIInterface::setSubscribers()
 
 void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg)
 {
-  if(!initialized_){
+  if (!initialized_) {
     return;
   }
 
   ROS_INFO_STREAM_ONCE(kScreenPrefix + "Received first roll pitch yawrate thrust command msg");
 
-  double roll_cmd = msg->roll*180.0/M_PI;
-  double pitch_cmd = -msg->pitch*180.0/M_PI;
-  double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
-  double throttle_cmd = msg->thrust.z*thrust_constant_;
+  double roll_cmd = msg->roll * 180.0 / M_PI;
+  double pitch_cmd = -msg->pitch * 180.0 / M_PI;
+  double yaw_rate_cmd = -msg->yaw_rate * 180.0 / M_PI;
+  double throttle_cmd = msg->thrust.z * thrust_constant_;
 
   // zero thrust_cmd will shut off the motors.
-  if(throttle_cmd <= 0){
+  if (throttle_cmd <= 0) {
     ROS_WARN_STREAM(kScreenPrefix + "Throttle command is negative.. set to minimum");
     throttle_cmd = 5;
   }
@@ -197,7 +196,7 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
 
 void DJIInterface::broadcastCallback()
 {
-  if(!initialized_){
+  if (!initialized_) {
     return;
   }
 
@@ -205,7 +204,7 @@ void DJIInterface::broadcastCallback()
   DJI::onboardSDK::BroadcastData data;
   dji_comm_.getBroadcastData(&data);
 
-//  std::cout << "firmware_version: " << firmware_version_ << std::endl;
+  //  std::cout << "firmware_version: " << firmware_version_ << std::endl;
   processIMU(data);
   processRc(data);
   processStatusInfo(data);
@@ -312,10 +311,9 @@ bool DJIInterface::checkNewData(FlightDataType data_type, const unsigned short m
   return false;
 }
 
-//process data
+// process data
 void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data)
 {
-
   if (!checkNewData(FlightDataType::IMU, data.dataFlag)) {
     // no new imu data
     return;
@@ -324,9 +322,9 @@ void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data)
   // new IMU msg
   sensor_msgs::Imu msg;
   msg.header.frame_id = frame_id_;
-  msg.header.stamp = ros::Time::now();  //todo(fmina) time sync
+  msg.header.stamp = ros::Time::now();  // todo(fmina) time sync
 
-  //transform attitude from NED to ENU
+  // transform attitude from NED to ENU
   Eigen::Quaterniond q_NED(data.q.q0, data.q.q1, data.q.q2, data.q.q3);
   Eigen::Quaterniond q_ENU = Eigen::Quaterniond(0, 1.0 / sqrt(2.0), 1.0 / sqrt(2.0), 0) * q_NED
       * Eigen::Quaterniond(0, 1, 0, 0);
@@ -358,7 +356,6 @@ void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data)
   msg.linear_acceleration_covariance[8] = kLinearAccelerationNoiseVariance;
 
   imu_pub_.publish(msg);
-
 }
 
 void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
@@ -371,7 +368,7 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   sensor_msgs::Joy msg;
 
   msg.header.frame_id = frame_id_;
-  msg.header.stamp = ros::Time::now();  //todo(fmina) time sync
+  msg.header.stamp = ros::Time::now();  // todo(fmina) time sync
 
   msg.axes.resize(8);
   // axis 0 is pitch
@@ -380,15 +377,15 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   msg.axes[1] = -data.rc.roll / kRCStickMaxValue;
   // axis 2 is thrust
   msg.axes[2] = data.rc.throttle / kRCStickMaxValue;
-  //axis 3 is yaw
+  // axis 3 is yaw
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
-  //axis 4 is enable/disable external commands
+  // axis 4 is enable/disable external commands
   if (data.rc.gear < -kRCStickMaxValue / 2) {
     msg.axes[4] = 1;
   } else {
     msg.axes[4] = -1;
   }
-  //axis 5 is mode
+  // axis 5 is mode
   if (data.rc.mode == 8000) {
     msg.axes[5] = 1;  // F mode
   } else if (data.rc.mode == 0) {
@@ -415,7 +412,6 @@ void DJIInterface::processTimeStamp(const DJI::onboardSDK::BroadcastData& data)
     // no new timestamp data
     return;
   }
-
 }
 void DJIInterface::processStatusInfo(const DJI::onboardSDK::BroadcastData& data)
 {
@@ -429,28 +425,28 @@ void DJIInterface::processStatusInfo(const DJI::onboardSDK::BroadcastData& data)
   msg.header.stamp = ros::Time::now();
   msg.battery_voltage = data.battery;
 
-  //todo get more flight status data
+  // todo get more flight status data
 
   status_pub_.publish(msg);
 }
 
 void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
 {
-
-  //need control status and RC data
+  // need control status and RC data
   if (!checkNewData(FlightDataType::Status, data.dataFlag)) {
     return;
   }
   if (!checkNewData(FlightDataType::RCData, data.dataFlag)) {
     return;
   }
-  //if RC is on F mode and serial is enabled, external control should be enabled
+  // if RC is on F mode and serial is enabled, external control should be
+  // enabled
   bool rc_mode_F = data.rc.mode == 8000;
   bool rc_serial_enabled = data.rc.gear < -kRCStickMaxValue / 2;
   bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
 
-//  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
-//  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
+  //  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
+  //  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
 
   if (rc_mode_F & rc_serial_enabled) {
     if (!external_control_mode) {
@@ -466,21 +462,22 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
 
 int DJIInterface::getFrequencyValue(int freq_hz)
 {
-switch (freq_hz) {
-  case (0):
-    return 0;
-  case (1):
-    return 1;
-  case (10):
-    return 2;
-  case (50):
-    return 3;
-  case (100):
-    return 4;
-  default:
-    ROS_WARN_STREAM(kScreenPrefix + "Unacceptable frequency value. Acceptable values are 0, 1, 10, 50, 100 Hz.");
-    return 5;
-}
+  switch (freq_hz) {
+    case (0):
+      return 0;
+    case (1):
+      return 1;
+    case (10):
+      return 2;
+    case (50):
+      return 3;
+    case (100):
+      return 4;
+    default:
+      ROS_WARN_STREAM(kScreenPrefix + "Unacceptable frequency value. Acceptable values are 0, "
+          "1, 10, 50, 100 Hz.");
+      return 5;
+  }
 }
 
-} /* namespace mav_disturbance_observer */
+}  // namespace dji_interface
