@@ -31,9 +31,7 @@
 namespace dji_comm {
 
 DJISerialPort::DJISerialPort(std::string device, unsigned int baudrate)
-    : device_(device),
-      baudrate_(baudrate)
-{
+    : device_(device), baudrate_(baudrate) {
   memLock_ = PTHREAD_MUTEX_INITIALIZER;
   msgLock_ = PTHREAD_MUTEX_INITIALIZER;
   ackLock_ = PTHREAD_MUTEX_INITIALIZER;
@@ -41,8 +39,7 @@ DJISerialPort::DJISerialPort(std::string device, unsigned int baudrate)
   device_status_ = false;
 }
 
-DJISerialPort::~DJISerialPort()
-{
+DJISerialPort::~DJISerialPort() {
   closeSerial();
   pthread_mutex_destroy(&memLock_);
   pthread_mutex_destroy(&msgLock_);
@@ -50,9 +47,9 @@ DJISerialPort::~DJISerialPort()
   pthread_cond_destroy(&ack_recv_cv_);
 }
 
-void DJISerialPort::init()
-{
-//  API_LOG(this, STATUS_LOG, "Open serial device %s with baudrate %u...\n", device_.c_str(), baudrate_);
+void DJISerialPort::init() {
+  //  API_LOG(this, STATUS_LOG, "Open serial device %s with baudrate %u...\n",
+  //  device_.c_str(), baudrate_);
   if (startSerial(device_.c_str(), baudrate_) < 0) {
     closeSerial();
     API_LOG(this, ERROR_LOG, "Failed to start serial device\n");
@@ -61,35 +58,24 @@ void DJISerialPort::init()
   device_status_ = true;
 }
 
-void DJISerialPort::usbHandshake(std::string device)
-{
+void DJISerialPort::usbHandshake(std::string device) {
   startSerial(device.c_str(), 38400);
   startSerial(device.c_str(), 19200);
   startSerial(device.c_str(), 38400);
   startSerial(device.c_str(), 19200);
 }
 
-void DJISerialPort::setBaudrate(unsigned int baudrate)
-{
-  baudrate_ = baudrate;
-}
+void DJISerialPort::setBaudrate(unsigned int baudrate) { baudrate_ = baudrate; }
 
-void DJISerialPort::setDevice(std::string device)
-{
-  device_ = device;
-}
+void DJISerialPort::setDevice(std::string device) { device_ = device; }
 
-bool DJISerialPort::getDevieStatus()
-{
-  return device_status_;
-}
+bool DJISerialPort::getDevieStatus() { return device_status_; }
 
-uint64_t DJISerialPort::getTimeStamp()
-{
+uint64_t DJISerialPort::getTimeStamp() {
 #ifdef __MACH__
   struct timeval now;
   gettimeofday(&now, NULL);
-  return (uint64_t) now.tv_sec * 1000 + (uint64_t) (now.tv_usec / 1.0e3);
+  return (uint64_t)now.tv_sec * 1000 + (uint64_t)(now.tv_usec / 1.0e3);
 #else
   struct timespec time;
   clock_gettime(CLOCK_REALTIME, &time);
@@ -97,8 +83,7 @@ uint64_t DJISerialPort::getTimeStamp()
 #endif
 }
 
-void DJISerialPort::wait(int timeout_ms)
-{
+void DJISerialPort::wait(int timeout_ms) {
   struct timespec absTimeout;
 #ifdef __MACH__
   struct timeval curTime;
@@ -115,55 +100,31 @@ void DJISerialPort::wait(int timeout_ms)
   pthread_cond_timedwait(&ack_recv_cv_, &ackLock_, &absTimeout);
 }
 
-size_t DJISerialPort::send(const uint8_t *buf, size_t len)
-{
+size_t DJISerialPort::send(const uint8_t *buf, size_t len) {
   return writeSerial(buf, len);
 }
 
-size_t DJISerialPort::readall(uint8_t *buf, size_t maxlen)
-{
+size_t DJISerialPort::readall(uint8_t *buf, size_t maxlen) {
   return readSerial(buf, maxlen);
 }
 
-void DJISerialPort::lockMemory()
-{
-  pthread_mutex_lock(&memLock_);
-}
+void DJISerialPort::lockMemory() { pthread_mutex_lock(&memLock_); }
 
-void DJISerialPort::freeMemory()
-{
-  pthread_mutex_unlock(&memLock_);
-}
+void DJISerialPort::freeMemory() { pthread_mutex_unlock(&memLock_); }
 
-void DJISerialPort::lockMSG()
-{
-  pthread_mutex_lock(&msgLock_);
-}
+void DJISerialPort::lockMSG() { pthread_mutex_lock(&msgLock_); }
 
-void DJISerialPort::freeMSG()
-{
-  pthread_mutex_unlock(&msgLock_);
-}
+void DJISerialPort::freeMSG() { pthread_mutex_unlock(&msgLock_); }
 
-void DJISerialPort::lockACK()
-{
-  pthread_mutex_lock(&ackLock_);
-}
+void DJISerialPort::lockACK() { pthread_mutex_lock(&ackLock_); }
 
-void DJISerialPort::freeACK()
-{
-  pthread_mutex_unlock(&ackLock_);
-}
+void DJISerialPort::freeACK() { pthread_mutex_unlock(&ackLock_); }
 
-void DJISerialPort::notify()
-{
-  pthread_cond_signal(&ack_recv_cv_);
-}
+void DJISerialPort::notify() { pthread_cond_signal(&ack_recv_cv_); }
 
 // serial port low level stuff
 
-bool DJISerialPort::openSerial(const char* dev)
-{
+bool DJISerialPort::openSerial(const char *dev) {
   serial_fd_ = open(dev, O_RDWR | O_NONBLOCK);
   if (serial_fd_ < 0) {
     API_LOG(this, ERROR_LOG, "Failed to open serial device %s\n", dev);
@@ -172,15 +133,13 @@ bool DJISerialPort::openSerial(const char* dev)
   return true;
 }
 
-bool DJISerialPort::closeSerial()
-{
+bool DJISerialPort::closeSerial() {
   close(serial_fd_);
   serial_fd_ = -1;
   return true;
 }
 
-bool DJISerialPort::flushSerial()
-{
+bool DJISerialPort::flushSerial() {
   if (serial_fd_ < 0) {
     API_LOG(this, ERROR_LOG, "flushing fail because no device is opened\n");
     return false;
@@ -190,10 +149,11 @@ bool DJISerialPort::flushSerial()
   }
 }
 
-bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits, char stop_bits)
-{
-  int st_baud[] = { B4800, B9600, B19200, B38400, B57600, B115200, B230400, B921600 };
-  int std_rate[] = { 4800, 9600, 19200, 38400, 57600, 115200, 230400, 921600 };
+bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits,
+                                 char stop_bits) {
+  int st_baud[] = {B4800,  B9600,   B19200,  B38400,
+                   B57600, B115200, B230400, B921600};
+  int std_rate[] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 921600};
 
   int i, j;
   struct termios newtio, oldtio;
@@ -225,13 +185,13 @@ bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits,
       newtio.c_cflag |= PARENB;
       newtio.c_cflag |= PARODD;
       break;
-      /* even */
+    /* even */
     case 'E':
     case 'e':
       newtio.c_cflag |= PARENB;
       newtio.c_cflag &= ~PARODD;
       break;
-      /* none */
+    /* none */
     case 'N':
     case 'n':
       newtio.c_cflag &= ~PARENB;
@@ -272,8 +232,7 @@ bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits,
   return true;
 }
 
-int DJISerialPort::startSerial(const char *dev_name, int baud_rate)
-{
+int DJISerialPort::startSerial(const char *dev_name, int baud_rate) {
   const char *ptemp;
   if (dev_name == NULL) {
     ptemp = "/dev/ttyUSB0";
@@ -281,22 +240,18 @@ int DJISerialPort::startSerial(const char *dev_name, int baud_rate)
     ptemp = dev_name;
   }
   if (true == openSerial(ptemp) && true == configSerial(baud_rate, 8, 'N', 1)) {
-
     FD_ZERO(&serial_fd_set_);
     FD_SET(serial_fd_, &serial_fd_set_);
     return serial_fd_;
-
   }
   return -1;
 }
 
-int DJISerialPort::writeSerial(const unsigned char *buf, int len)
-{
+int DJISerialPort::writeSerial(const unsigned char *buf, int len) {
   return write(serial_fd_, buf, len);
 }
 
-int DJISerialPort::readSerial(unsigned char *buf, int len)
-{
+int DJISerialPort::readSerial(unsigned char *buf, int len) {
   int saved = 0;
   int ret = -1;
 

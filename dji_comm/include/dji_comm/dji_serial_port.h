@@ -29,30 +29,28 @@
 #ifndef SRC_DJI_SERIAL_PORT_H_
 #define SRC_DJI_SERIAL_PORT_H_
 
+#include <dji_sdk_lib/DJI_HardDriver.h>
+#include <dji_sdk_lib/DJI_Type.h>
+#include <fcntl.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 #include <iostream>
 #include <string>
-#include <string.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pthread.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <sys/time.h>
-#include <dji_sdk_lib/DJI_Type.h>
-#include <dji_sdk_lib/DJI_HardDriver.h>
-
 
 namespace dji_comm {
 
 #ifndef B921600
-  #define B921600 921600
+#define B921600 921600
 #endif
 
-class DJISerialPort : public DJI::onboardSDK::HardDriver
-{
+class DJISerialPort : public DJI::onboardSDK::HardDriver {
  public:
   DJISerialPort(std::string device, unsigned int baudrate);
   ~DJISerialPort();
@@ -93,10 +91,11 @@ class DJISerialPort : public DJI::onboardSDK::HardDriver
 
   bool device_status_;
 
-  bool openSerial(const char* dev);
+  bool openSerial(const char *dev);
   bool closeSerial();
   bool flushSerial();
-  bool configSerial(int baudrate, char data_bits, char parity_bits, char stop_bits);
+  bool configSerial(int baudrate, char data_bits, char parity_bits,
+                    char stop_bits);
   int startSerial(const char *dev_name, int baud_rate);
   int writeSerial(const unsigned char *buf, int len);
   int readSerial(unsigned char *buf, int len);

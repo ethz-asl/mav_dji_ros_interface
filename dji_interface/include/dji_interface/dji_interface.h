@@ -29,10 +29,10 @@
 #ifndef SRC_DJI_INTERFACE_H_
 #define SRC_DJI_INTERFACE_H_
 
-#include <ros/ros.h>
 #include <mav_msgs/RollPitchYawrateThrust.h>
-#include <mav_msgs/default_topics.h>
 #include <mav_msgs/Status.h>
+#include <mav_msgs/default_topics.h>
+#include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Joy.h>
 
@@ -42,8 +42,7 @@
 
 namespace dji_interface {
 
-class DJIInterface
-{
+class DJIInterface {
  public:
   DJIInterface(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
   ~DJIInterface();
@@ -56,8 +55,7 @@ class DJIInterface
   static const std::string kScreenPrefix;
   static constexpr double kDefaultThrustConstant = 1.2013;
 
-  enum FlightDataType
-  {
+  enum FlightDataType {
     TimeStamp = 0,
     IMU,
     LinearVelocity,
@@ -69,20 +67,21 @@ class DJIInterface
     Status
   };
 
-  //ros nh
+  // ros nh
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
 
-  //ros publishers
+  // ros publishers
   ros::Publisher imu_pub_;
   ros::Publisher rc_pub_;
   ros::Publisher status_pub_;
 
-  //ros subscribers
+  // ros subscribers
   ros::Subscriber command_roll_pitch_yawrate_thrust_sub_;
 
-  //callbacks
-  void commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg);
+  // callbacks
+  void commandRollPitchYawrateThrustCallback(
+      const mav_msgs::RollPitchYawrateThrustConstPtr& msg);
 
   std::string frame_id_;
   std::string device_;
@@ -103,18 +102,17 @@ class DJIInterface
 
   void broadcastCallback();
 
-  //process packets
+  // process packets
   void processIMU(const DJI::onboardSDK::BroadcastData& data);
   void processRc(const DJI::onboardSDK::BroadcastData& data);
   void processTimeStamp(const DJI::onboardSDK::BroadcastData& data);
   void processStatusInfo(const DJI::onboardSDK::BroadcastData& data);
 
-
   void updateControlMode(const DJI::onboardSDK::BroadcastData& data);
 
   DJI::onboardSDK::Version firmware_version_;
-  //flight data masks
-  typedef struct FlightDataMaskM100{
+  // flight data masks
+  typedef struct FlightDataMaskM100 {
     static constexpr unsigned short kTimeStampMask = 0x0001;
     static constexpr unsigned short kIMUMask = 0x0016;
     static constexpr unsigned short kGPSMask = 0x0020;
@@ -124,7 +122,7 @@ class DJIInterface
     static constexpr unsigned short kStatusMask = 0xE00;
   } FlightDataMaskM100_t;
 
-  typedef struct FlightDataMaskA3{
+  typedef struct FlightDataMaskA3 {
     static constexpr unsigned short kTimeStampMask = 0x0001;
     static constexpr unsigned short kIMUMask = 0x0016;
     static constexpr unsigned short kGPSMask = 0x0040;
@@ -152,7 +150,6 @@ class DJIInterface
   5 <- anything else (don't change freq)
   */
   int getFrequencyValue(int freq_hz);
-
 };
 
 } /* namespace dji_interface */

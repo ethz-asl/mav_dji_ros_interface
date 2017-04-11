@@ -26,11 +26,10 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "dji_interface/dji_interface.h"
 #include <ros/ros.h>
+#include "dji_interface/dji_interface.h"
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   ros::init(argc, argv, "DJIInterfaceNode");
 
   ros::NodeHandle nh, private_nh("~");
