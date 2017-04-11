@@ -97,53 +97,52 @@ void DJIInterface::loadParameters()
   private_nh_.param<int>("rc_update_rate", rc_update_rate, DJI::onboardSDK::BROADCAST_FREQ_50HZ);
   private_nh_.param<int>("status_update_rate", status_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
 
-  uint8_t freq[16] = {DJI::onboardSDK::BROADCAST_FREQ_0HZ};
+  //  = {DJI::onboardSDK::BROADCAST_FREQ_0HZ};
+  broadcast_frequency_.resize(kBroadcastFrequencySize, DJI::onboardSDK::BROADCAST_FREQ_0HZ);
 
   if (drone_version_ == "M100") {
     // M100
 
     //timestamp
-    freq[0] = getFrequencyValue(time_stamp_update_rate);
+    broadcast_frequency_[0] = getFrequencyValue(time_stamp_update_rate);
     //IMU
-    freq[1] = getFrequencyValue(imu_update_rate);
-    freq[2] = getFrequencyValue(imu_update_rate);
-    freq[3] = getFrequencyValue(imu_update_rate);
-    freq[4] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
-    freq[5] = getFrequencyValue(gps_updae_rate);
+    broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     //magnetometer
-    freq[6] = getFrequencyValue(magnetometer_update_rate);
+    broadcast_frequency_[6] = getFrequencyValue(magnetometer_update_rate);
     //rc data
-    freq[7] = getFrequencyValue(rc_update_rate);
+    broadcast_frequency_[7] = getFrequencyValue(rc_update_rate);
     //status
-    freq[9] = getFrequencyValue(status_update_rate);
-    freq[10] = getFrequencyValue(status_update_rate);
-    freq[11] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[9] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[10] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[11] = getFrequencyValue(status_update_rate);
   } else {
     // A3
 
     //timestamp
-    freq[0] = getFrequencyValue(time_stamp_update_rate);
+    broadcast_frequency_[0] = getFrequencyValue(time_stamp_update_rate);
     //IMU
-    freq[1] = getFrequencyValue(imu_update_rate);
-    freq[2] = getFrequencyValue(imu_update_rate);
-    freq[3] = getFrequencyValue(imu_update_rate);
-    freq[4] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
+    broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
-    freq[5] = getFrequencyValue(gps_updae_rate);
-    freq[6] = getFrequencyValue(gps_updae_rate);
-    freq[7] = getFrequencyValue(gps_updae_rate);
+    broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
+    broadcast_frequency_[6] = getFrequencyValue(gps_updae_rate);
+    broadcast_frequency_[7] = getFrequencyValue(gps_updae_rate);
     //magnetometer
-    freq[8] = getFrequencyValue(magnetometer_update_rate);
+    broadcast_frequency_[8] = getFrequencyValue(magnetometer_update_rate);
     //rc data
-    freq[9] = getFrequencyValue(rc_update_rate);
+    broadcast_frequency_[9] = getFrequencyValue(rc_update_rate);
     //status
-    freq[11] = getFrequencyValue(status_update_rate);
-    freq[12] = getFrequencyValue(status_update_rate);
-    freq[13] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[11] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[12] = getFrequencyValue(status_update_rate);
+    broadcast_frequency_[13] = getFrequencyValue(status_update_rate);
   }
-
-  dji_comm_.setBroadcastFrequency(freq);
 
   ROS_INFO("parameters loaded correctly");
 }
@@ -153,6 +152,7 @@ void DJIInterface::init()
   dji_comm_.init(device_, baudrate_);
   dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.getFirmwareVersion(&firmware_version_);
+  dji_comm_.setBroadcastFrequency(broadcast_frequency_.data());
   dji_comm_.setBroadcastCallback(&DJIInterface::broadcastCallback, this);
 
   setPublishers();

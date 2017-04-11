@@ -141,6 +141,8 @@ class DJIInterface
   // helper methods
   bool checkNewData(FlightDataType data_type, const unsigned short msg_flag);
 
+  static constexpr size_t kBroadcastFrequencySize = 16;
+  std::vector<uint8_t> broadcast_frequency_;
   /*
   0 <- 0Hz
   1 <- 1Hz
