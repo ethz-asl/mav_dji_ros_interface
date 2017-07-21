@@ -54,7 +54,7 @@ class DJIInterface
   static constexpr double kGravity = 9.807;
   static constexpr double kRCStickMaxValue = 10000.0;
   static const std::string kScreenPrefix;
-  static constexpr double kDefaultThrustConstant = 0.8324;
+  static constexpr double kDefaultThrustConstant = 1.2013;
 
   enum FlightDataType
   {
@@ -135,11 +135,24 @@ class DJIInterface
     static constexpr unsigned short kStatusMask = 0x3800;
   } FlightDataMaskA3_t;
 
-
   FlightDataMaskM100_t flight_data_mask_M100_;
   FlightDataMaskA3_t flight_data_mask_A3_;
 
+  // helper methods
   bool checkNewData(FlightDataType data_type, const unsigned short msg_flag);
+
+  static constexpr size_t kBroadcastFrequencySize = 16;
+  std::vector<uint8_t> broadcast_frequency_;
+  /*
+  0 <- 0Hz
+  1 <- 1Hz
+  2 <- 10Hz
+  3 <- 50Hz
+  4 <- 100Hz
+  5 <- anything else (don't change freq)
+  */
+  int getFrequencyValue(int freq_hz);
+
 };
 
 } /* namespace dji_interface */

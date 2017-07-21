@@ -106,4 +106,8 @@ void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, doubl
   flight_ptr_->setMovementControl(0x2A, roll_cmd, pitch_cmd, thrust, yaw_rate);
 }
 
+void DJIComm::setBroadcastFrequency(uint8_t* freq){
+  core_api_ptr_->setBroadcastFreq(freq);
+}
+
 } /* namespace dji_comm */

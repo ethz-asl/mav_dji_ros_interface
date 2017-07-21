@@ -1,3 +1,12 @@
 device: "/dev/tty.usbserial-AI02B86I"
 app_id: 1027253
 enc_key: "2267d8cc7874b641a2d16798afb659ba4876b5dfd9b0a0e471c00e188b5c9ed3"
+
+
+#available freq: 0 1 10 50 100 Hz
+imu_update_rate: 100
+gps_updae_rate: 10
+time_stamp_update_rate: 1
+magnetometer_update_rate: 10
+rc_update_rate: 50
+status_update_rate: 10
