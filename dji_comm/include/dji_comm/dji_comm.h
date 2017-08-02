@@ -98,6 +98,7 @@ class DJIComm
   void setBroadcastFrequency(uint8_t* freq);
 
  private:
+  static constexpr int kSerialTimeout_ms = 100;
   //ros
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;

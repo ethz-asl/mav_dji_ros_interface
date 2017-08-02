@@ -103,13 +103,13 @@ void DJISerialPort::wait(int timeout_ms)
 #ifdef __MACH__
   struct timeval curTime;
   gettimeofday(&curTime, NULL);
-  absTimeout.tv_sec = curTime.tv_sec + timeout_ms * 1000;
-  absTimeout.tv_nsec = curTime.tv_usec / 1000;
+  absTimeout.tv_sec = curTime.tv_sec; //+ (curTime.tv_usec*1000 + timeout_ms*1e6)%1e9;
+  absTimeout.tv_nsec = curTime.tv_usec*1000 + timeout_ms*1e6; // - 1e9*(curTime.tv_usec*1000 + timeout_ms*1e6)%1e9;
 #else
   struct timespec curTime;
   clock_gettime(CLOCK_REALTIME, &curTime);
-  absTimeout.tv_sec = curTime.tv_sec + timeout_ms * 1000;
-  absTimeout.tv_nsec = curTime.tv_nsec;
+  absTimeout.tv_sec = curTime.tv_sec;
+  absTimeout.tv_nsec = curTime.tv_nsec + timeout_ms*1e6;
 
 #endif
   pthread_cond_timedwait(&ack_recv_cv_, &ackLock_, &absTimeout);
