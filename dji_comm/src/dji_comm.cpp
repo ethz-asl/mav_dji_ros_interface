@@ -98,8 +98,9 @@ void* DJIComm::mainCommunicationThread(void* core_api){
   }
 }
 
-void DJIComm::setExternalControl(bool enable){
-  core_api_ptr_->setControl(enable);
+void DJIComm::setExternalControl(bool enable)
+{
+  unsigned short res = core_api_ptr_->setControl(enable, kSerialTimeout_ms);
 }
 
 void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust){
