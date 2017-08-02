@@ -187,9 +187,13 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   double throttle_cmd = msg->thrust.z*thrust_constant_;
 
   // zero thrust_cmd will shut off the motors.
-  if(throttle_cmd <= 0){
-    ROS_WARN_STREAM(kScreenPrefix + "Throttle command is negative.. set to minimum");
-    throttle_cmd = 5;
+  if(throttle_cmd < 10){
+    ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is below minimum.. set to minimum");
+    throttle_cmd = 10;
+  }
+  if(throttle_cmd > 95){
+    ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is too high.. set to max");
+    throttle_cmd = 95;
   }
 
   dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd, throttle_cmd);
@@ -389,11 +393,11 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
     msg.axes[4] = -1;
   }
   //axis 5 is mode
-  if (data.rc.mode == 8000) {
+  if (data.rc.mode == 10000) {
     msg.axes[5] = 1;  // F mode
   } else if (data.rc.mode == 0) {
     msg.axes[5] = 0;  // A mode
-  } else if (data.rc.mode == -8000) {
+  } else if (data.rc.mode == -10000) {
     msg.axes[5] = -1;  // P mode
   }
 
@@ -445,23 +449,32 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
   //if RC is on F mode and serial is enabled, external control should be enabled
-  bool rc_mode_F = data.rc.mode == 8000;
+  bool rc_mode_F = data.rc.mode == 10000;
   bool rc_serial_enabled = data.rc.gear < -kRCStickMaxValue / 2;
   bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
 
-//  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
-//  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
+  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
+  std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
 
-  if (rc_mode_F & rc_serial_enabled) {
+  if(rc_mode_F){
     if (!external_control_mode) {
       dji_comm_.setExternalControl(true);
     }
   }
 
+  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
+//  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
+
+//  if (rc_mode_F & rc_serial_enabled) {
+//    if (!external_control_mode) {
+//      dji_comm_.setExternalControl(true);
+//    }
+//  }
+
   // if serial is disabled and external control is enabled, no external control
-  if (!rc_serial_enabled & external_control_mode) {
-    dji_comm_.setExternalControl(false);
-  }
+//  if (!rc_serial_enabled & external_control_mode) {
+//    dji_comm_.setExternalControl(false);
+//  }
 }
 
 int DJIInterface::getFrequencyValue(int freq_hz)
