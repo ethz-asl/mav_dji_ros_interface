@@ -1,6 +1,6 @@
-device: "/dev/tty.usbserial-AI02B86I"
-app_id: 1027253
-enc_key: "2267d8cc7874b641a2d16798afb659ba4876b5dfd9b0a0e471c00e188b5c9ed3"
+device: "/dev/tty.usbserial-A104JS3T"
+app_id: 1040678
+enc_key: "a41335b074411eb3408029cd0955324df2d3b84e5c0d80ed8344ae5c34e05cb2"
 
 
 #available freq: 0 1 10 50 100 Hz
