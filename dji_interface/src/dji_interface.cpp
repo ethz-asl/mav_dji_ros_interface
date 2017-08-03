@@ -186,12 +186,6 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
   double throttle_cmd = msg->thrust.z*thrust_constant_;
 
-  std::cout << "roll_cmd: " << roll_cmd << std::endl;
-  std::cout << "pitch_cmd: " << pitch_cmd << std::endl;
-  std::cout << "yaw_rate_cmd: " << yaw_rate_cmd << std::endl;
-  std::cout << "throttle_cmd: " << throttle_cmd << std::endl;
-
-  // zero thrust_cmd will shut off the motors.
   if(throttle_cmd < 10){
     ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is below minimum.. set to minimum");
     throttle_cmd = 10;
@@ -214,7 +208,6 @@ void DJIInterface::broadcastCallback()
   DJI::onboardSDK::BroadcastData data;
   dji_comm_.getBroadcastData(&data);
 
-//  std::cout << "firmware_version: " << firmware_version_ << std::endl;
   processIMU(data);
   processRc(data);
   processStatusInfo(data);
@@ -399,18 +392,18 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   //axis 3 is yaw
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
-  if (data.rc.gear == -kRCStickMaxValue) {
-    msg.axes[4] = 1;
+  if (data.rc.gear == int(-kRCStickMaxValue)) {
+    msg.axes[5] = 1;
   } else {
-    msg.axes[4] = -1;
+    msg.axes[5] = -1;
   }
   //axis 5 is mode
-  if (data.rc.mode == 10000) {
-    msg.axes[5] = 1;  // F mode
+  if (data.rc.mode == int(kRCStickMaxValue)) {
+    msg.axes[4] = 1;  // F mode
   } else if (data.rc.mode == 0) {
-    msg.axes[5] = 0;  // A mode
-  } else if (data.rc.mode == -10000) {
-    msg.axes[5] = -1;  // P mode
+    msg.axes[4] = 0;  // A mode
+  } else if (data.rc.mode == int(-kRCStickMaxValue)) {
+    msg.axes[4] = -1;  // P mode
   }
 
   msg.axes[6] = 0;
@@ -461,9 +454,9 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
   //if RC is on F mode and serial is enabled, external control should be enabled
-  bool rc_mode_F = data.rc.mode == 10000;
-  bool rc_serial_enabled = data.rc.gear == -kRCStickMaxValue;
-  bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
+  bool rc_mode_F = data.rc.mode == int(kRCStickMaxValue);
+  bool rc_serial_enabled = data.rc.gear == int(-kRCStickMaxValue);
+  bool external_control_mode = data.ctrlInfo.deviceStatus == DJI::onboardSDK::Flight::DEVICE_SDK;
 
 //  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
 //  std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
@@ -474,7 +467,7 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
     }
   }
 
-  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
+//  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
 //  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
 
 //  if (rc_mode_F & rc_serial_enabled) {
