@@ -393,17 +393,17 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
   if (data.rc.gear == int(-kRCStickMaxValue)) {
-    msg.axes[5] = 1;
+    msg.axes[4] = 1;
   } else {
-    msg.axes[5] = -1;
+    msg.axes[4] = -1;
   }
   //axis 5 is mode
   if (data.rc.mode == int(kRCStickMaxValue)) {
-    msg.axes[4] = 1;  // F mode
+    msg.axes[5] = 1;  // F mode
   } else if (data.rc.mode == 0) {
-    msg.axes[4] = 0;  // A mode
+    msg.axes[5] = 0;  // A mode
   } else if (data.rc.mode == int(-kRCStickMaxValue)) {
-    msg.axes[4] = -1;  // P mode
+    msg.axes[5] = -1;  // P mode
   }
 
   msg.axes[6] = 0;
