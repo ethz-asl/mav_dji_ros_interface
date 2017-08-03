@@ -379,7 +379,7 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
 
   msg.axes.resize(8);
   // axis 0 is pitch
-  msg.axes[0] = -data.rc.pitch / kRCStickMaxValue;
+  msg.axes[0] = data.rc.pitch / kRCStickMaxValue;
   // axis 1 is roll
   msg.axes[1] = -data.rc.roll / kRCStickMaxValue;
   // axis 2 is thrust
@@ -453,8 +453,8 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
   bool rc_serial_enabled = data.rc.gear < -kRCStickMaxValue / 2;
   bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
 
-  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
-  std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
+//  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
+//  std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
 
   if(rc_mode_F){
     if (!external_control_mode) {
