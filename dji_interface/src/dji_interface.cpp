@@ -108,9 +108,9 @@ void DJIInterface::loadParameters()
     //IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
-    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
+    broadcast_frequency_[3] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     //magnetometer
     broadcast_frequency_[6] = getFrequencyValue(magnetometer_update_rate);
@@ -128,9 +128,9 @@ void DJIInterface::loadParameters()
     //IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
-    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
+    broadcast_frequency_[3] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[6] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[7] = getFrequencyValue(gps_updae_rate);
