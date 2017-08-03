@@ -5,7 +5,7 @@ find_package(catkin REQUIRED)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 add_definitions(-std=c++11)
 
 cs_add_library(${PROJECT_NAME}_lib src/dji_interface.cpp)
