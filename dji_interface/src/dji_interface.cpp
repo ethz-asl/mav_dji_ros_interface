@@ -186,6 +186,11 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
   double throttle_cmd = msg->thrust.z*thrust_constant_;
 
+  std::cout << "roll_cmd: " << roll_cmd << std::endl;
+  std::cout << "pitch_cmd: " << pitch_cmd << std::endl;
+  std::cout << "yaw_rate_cmd: " << yaw_rate_cmd << std::endl;
+  std::cout << "throttle_cmd: " << throttle_cmd << std::endl;
+
   // zero thrust_cmd will shut off the motors.
   if(throttle_cmd < 10){
     ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is below minimum.. set to minimum");
@@ -372,12 +377,12 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
 
-  std::cout << "data.rc.roll: " << data.rc.roll << std::endl;
-  std::cout << "data.rc.pitch: " << data.rc.pitch << std::endl;
-  std::cout << "data.rc.throttle: " << data.rc.throttle << std::endl;
-  std::cout << "data.rc.yaw: " << data.rc.yaw << std::endl;
-  std::cout << "data.rc.mode: " << data.rc.mode << std::endl;
-  std::cout << "data.rc.gear: " << data.rc.gear << std::endl;
+//  std::cout << "data.rc.roll: " << data.rc.roll << std::endl;
+//  std::cout << "data.rc.pitch: " << data.rc.pitch << std::endl;
+//  std::cout << "data.rc.throttle: " << data.rc.throttle << std::endl;
+//  std::cout << "data.rc.yaw: " << data.rc.yaw << std::endl;
+//  std::cout << "data.rc.mode: " << data.rc.mode << std::endl;
+//  std::cout << "data.rc.gear: " << data.rc.gear << std::endl;
 
   sensor_msgs::Joy msg;
 
@@ -394,7 +399,7 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   //axis 3 is yaw
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
-  if (data.rc.gear < -kRCStickMaxValue / 2) {
+  if (data.rc.gear == -kRCStickMaxValue) {
     msg.axes[4] = 1;
   } else {
     msg.axes[4] = -1;
@@ -457,7 +462,7 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
   }
   //if RC is on F mode and serial is enabled, external control should be enabled
   bool rc_mode_F = data.rc.mode == 10000;
-  bool rc_serial_enabled = data.rc.gear < -kRCStickMaxValue / 2;
+  bool rc_serial_enabled = data.rc.gear == -kRCStickMaxValue;
   bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
 
 //  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
