@@ -372,6 +372,13 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
 
+  std::cout << "data.rc.roll: " << data.rc.roll << std::endl;
+  std::cout << "data.rc.pitch: " << data.rc.pitch << std::endl;
+  std::cout << "data.rc.throttle: " << data.rc.throttle << std::endl;
+  std::cout << "data.rc.yaw: " << data.rc.yaw << std::endl;
+  std::cout << "data.rc.mode: " << data.rc.mode << std::endl;
+  std::cout << "data.rc.gear: " << data.rc.gear << std::endl;
+
   sensor_msgs::Joy msg;
 
   msg.header.frame_id = frame_id_;
