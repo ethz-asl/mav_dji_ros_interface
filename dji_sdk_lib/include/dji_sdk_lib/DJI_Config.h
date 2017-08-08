@@ -13,8 +13,8 @@
 #define DJI_CONFIG_H
 
 #include <stdint.h>
-#define MEMORY_SIZE 1024 // unit is byte
-#define BUFFER_SIZE 1024
+#define MEMORY_SIZE 256//512 //1024// unit is byte
+#define BUFFER_SIZE 256//512 //1024
 #define ACK_SIZE 10
 
 //! @note The static memory flag means DJI onboardSDK library will not alloc memory from heap.

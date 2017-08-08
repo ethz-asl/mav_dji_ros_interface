@@ -150,8 +150,8 @@ void DJIInterface::loadParameters()
 void DJIInterface::init()
 {
   dji_comm_.init(device_, baudrate_);
-  dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.getFirmwareVersion(&firmware_version_);
+  dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.setBroadcastFrequency(broadcast_frequency_.data());
   dji_comm_.setBroadcastCallback(&DJIInterface::broadcastCallback, this);
 
@@ -162,15 +162,16 @@ void DJIInterface::init()
 
 void DJIInterface::setPublishers()
 {
-  imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 10);
-  rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 10);
-  status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 10);
+  imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 1);
+  rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 1);
+  status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 1);
 }
 
 void DJIInterface::setSubscribers()
 {
   command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
-                                                         &DJIInterface::commandRollPitchYawrateThrustCallback, this);
+                                                         &DJIInterface::commandRollPitchYawrateThrustCallback, this, 
+                                                         ros::TransportHints().tcpNoDelay());
 }
 
 void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg)
@@ -392,17 +393,17 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   //axis 3 is yaw
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
-  if (data.rc.gear == int(-kRCStickMaxValue)) {
+  if (data.rc.gear < int(-kRCStickMaxValue/2)) {
     msg.axes[4] = 1;
   } else {
     msg.axes[4] = -1;
   }
   //axis 5 is mode
-  if (data.rc.mode == int(kRCStickMaxValue)) {
+  if (data.rc.mode == 8000) {
     msg.axes[5] = 1;  // F mode
   } else if (data.rc.mode == 0) {
     msg.axes[5] = 0;  // A mode
-  } else if (data.rc.mode == int(-kRCStickMaxValue)) {
+  } else if (data.rc.mode == -8000) {
     msg.axes[5] = -1;  // P mode
   }
 
@@ -454,12 +455,12 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
   //if RC is on F mode and serial is enabled, external control should be enabled
-  bool rc_mode_F = data.rc.mode == int(kRCStickMaxValue);
-  bool rc_serial_enabled = data.rc.gear == int(-kRCStickMaxValue);
+  bool rc_mode_F = data.rc.mode == 8000;
+  bool rc_serial_enabled = data.rc.gear < int(-kRCStickMaxValue/2);
   bool external_control_mode = data.ctrlInfo.deviceStatus == DJI::onboardSDK::Flight::DEVICE_SDK;
 
-//  std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
-//  std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
+ // std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
+ // std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
 
   if(rc_mode_F){
     if (!external_control_mode) {
