@@ -147,9 +147,6 @@ void* DJIComm::mainCommunicationThread(void* core_api){
       max_read_time = 0;
       average_sending_time = 0;
       average_read_time = 0;
-
-
-
       counter = 0;
     }
 
@@ -163,7 +160,24 @@ void DJIComm::setExternalControl(bool enable)
 }
 
 void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, double yaw_rate, double thrust){
+  static int counter = 0;
+  static double max_dt = 0.0;
+  ros::WallTime t1 = ros::WallTime::now();
   flight_ptr_->setMovementControl(0x2A, roll_cmd, pitch_cmd, thrust, yaw_rate);
+  ros::WallTime t2 = ros::WallTime::now();
+
+  double dt = (t2-t1).toSec();
+  if(dt > max_dt){
+    max_dt = dt;
+  }
+  counter++;
+
+  if(counter > 100){
+    std::cout << "send one command dt: " << dt << "\t max dt: " << max_dt << std::endl;
+    max_dt = 0;
+    counter = 0;
+  }
+
 }
 
 void DJIComm::setBroadcastFrequency(uint8_t* freq){
