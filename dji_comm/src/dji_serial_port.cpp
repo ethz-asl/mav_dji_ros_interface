@@ -255,7 +255,7 @@ bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits,
 
   /* config waiting time & min number of char */
   newtio.c_cc[VTIME] = 1;
-  newtio.c_cc[VMIN] = 1;
+  newtio.c_cc[VMIN] = 18; // from osdk
 
   /* using the raw data mode */
   newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
