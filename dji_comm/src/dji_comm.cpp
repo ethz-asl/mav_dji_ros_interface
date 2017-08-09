@@ -58,20 +58,20 @@ void DJIComm::init(std::string device, unsigned int baudrate)
   follow_ptr_.reset(new DJI::onboardSDK::Follow(core_api_ptr_.get()));
 
 
-  int ret_read = pthread_create(&read_communication_thread_, 0, mainReadCommunicationThread, (void *)core_api_ptr_.get());
-  int ret_send = pthread_create(&send_communication_thread_, 0, mainSendCommunicationThread, (void *)core_api_ptr_.get());
+  int ret = pthread_create(&communication_thread_, 0, mainCommunicationThread, (void *)core_api_ptr_.get());
+//  int ret_send = pthread_create(&send_communication_thread_, 0, mainSendCommunicationThread, (void *)core_api_ptr_.get());
 
-  if (0 != ret_read){
-    ROS_FATAL("Cannot create new thread for readPoll!");
+  if (0 != ret){
+    ROS_FATAL("Cannot create new thread for readPoll and sendPoll!");
   }else{
-    ROS_INFO("Succeed to create thread for readPoll");
+    ROS_INFO("Succeed to create thread for readPoll and sendPoll");
   }
 
-  if (0 != ret_send){
-    ROS_FATAL("Cannot create new thread for sendPoll!");
-  }else{
-    ROS_INFO("Succeed to create thread for sendPoll");
-  }
+//  if (0 != ret_send){
+//    ROS_FATAL("Cannot create new thread for sendPoll!");
+//  }else{
+//    ROS_INFO("Succeed to create thread for sendPoll");
+//  }
 
   core_api_ptr_->getDroneVersion();
   ros::Duration(1.0).sleep();
@@ -98,18 +98,20 @@ void DJIComm::broadcastCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardS
   ( (DJIComm*)userData )->broadcast_callback_();
 }
 
-void* DJIComm::mainReadCommunicationThread(void* core_api){
-  DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
-  while (ros::ok()) {
-    p_coreAPI->readPoll();
-    usleep(10);
-  }
-}
+//void* DJIComm::mainReadCommunicationThread(void* core_api){
+//  DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
+//  while (ros::ok()) {
+//    p_coreAPI->readPoll();
+//    usleep(10);
+//  }
+//}
 
-void* DJIComm::mainSendCommunicationThread(void* core_api){
+void* DJIComm::mainCommunicationThread(void* core_api){
   DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
   while (ros::ok()) {
     p_coreAPI->sendPoll();
+    usleep(10);
+    p_coreAPI->readPoll();
     usleep(10);
   }
 }

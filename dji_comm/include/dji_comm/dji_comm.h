@@ -104,8 +104,8 @@ class DJIComm
   ros::NodeHandle private_nh_;
 
   std::shared_ptr<DJISerialPort> serial_;
-  pthread_t read_communication_thread_;
-  pthread_t send_communication_thread_;
+  pthread_t communication_thread_;
+//  pthread_t send_communication_thread_;
 
 
   // callbacks
@@ -128,8 +128,8 @@ class DJIComm
   static void missionStatusCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
   static void missionEventCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
 
-  static void* mainReadCommunicationThread(void* core_api);
-  static void* mainSendCommunicationThread(void* core_api);
+//  static void* mainReadCommunicationThread(void* core_api);
+  static void* mainCommunicationThread(void* core_api);
 
 };
 
