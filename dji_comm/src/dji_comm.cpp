@@ -143,6 +143,13 @@ void* DJIComm::mainCommunicationThread(void* core_api){
       average_read_time = average_read_time/counter;
       std::cout << "avg send time: " << average_sending_time << "\t max send time: " << max_sending_time << std::endl;
       std::cout << "avg read time: " << average_read_time << "\t max read time: " << max_read_time << std::endl;
+      max_sending_time = 0;
+      max_read_time = 0;
+      average_sending_time = 0;
+      average_read_time = 0;
+
+
+
       counter = 0;
     }
 
