@@ -57,6 +57,7 @@ void DJIComm::init(std::string device, unsigned int baudrate)
   hot_point_ptr_.reset(new DJI::onboardSDK::HotPoint(core_api_ptr_.get()));
   follow_ptr_.reset(new DJI::onboardSDK::Follow(core_api_ptr_.get()));
 
+
   int ret_read = pthread_create(&read_communication_thread_, 0, mainReadCommunicationThread, (void *)core_api_ptr_.get());
   int ret_send = pthread_create(&send_communication_thread_, 0, mainSendCommunicationThread, (void *)core_api_ptr_.get());
 
@@ -101,7 +102,7 @@ void* DJIComm::mainReadCommunicationThread(void* core_api){
   DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
   while (ros::ok()) {
     p_coreAPI->readPoll();
-    usleep(1000);
+    usleep(10);
   }
 }
 
@@ -109,7 +110,7 @@ void* DJIComm::mainSendCommunicationThread(void* core_api){
   DJI::onboardSDK::CoreAPI* p_coreAPI = (DJI::onboardSDK::CoreAPI*) core_api;
   while (ros::ok()) {
     p_coreAPI->sendPoll();
-    usleep(1000);
+    usleep(10);
   }
 }
 
