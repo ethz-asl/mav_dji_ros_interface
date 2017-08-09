@@ -205,6 +205,10 @@ void DJIInterface::broadcastCallback()
     return;
   }
 
+  static int counter = 0;
+  static double max_dt = 0.0;
+  ros::WallTime t1 = ros::WallTime::now();
+
   ROS_INFO_ONCE("Received broadcast data");
   DJI::onboardSDK::BroadcastData data;
   dji_comm_.getBroadcastData(&data);
@@ -215,6 +219,21 @@ void DJIInterface::broadcastCallback()
   processTimeStamp(data);
 
   updateControlMode(data);
+
+  ros::WallTime t2 = ros::WallTime::now();
+
+  double dt = (t2-t1).toSec();
+    if(dt > max_dt){
+      max_dt = dt;
+    }
+    counter++;
+
+    if(counter > 100){
+      std::cout << "broadcast dt: " << dt*1e3 << "\t max dt: " << max_dt*1e3 << std::endl;
+      max_dt = 0;
+      counter = 0;
+    }
+
 }
 
 bool DJIInterface::checkNewData(FlightDataType data_type, const unsigned short msg_flag)
