@@ -4,7 +4,7 @@ enc_key: "a41335b074411eb3408029cd0955324df2d3b84e5c0d80ed8344ae5c34e05cb2"
 
 
 #available freq: 0 1 10 50 100 Hz
-imu_update_rate: 100
+imu_update_rate: 50
 gps_updae_rate: 10
 time_stamp_update_rate: 1
 magnetometer_update_rate: 10

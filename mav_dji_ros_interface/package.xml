@@ -5,6 +5,7 @@
   <description>DJI MAV ros interface</description>
 
   <maintainer email="fmina@ethz.ch">Mina Kamel</maintainer>
+  <maintainer email="inkyu.sa@mavt.ethz.ch">Inkyu Sa</maintainer>
 
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>

@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2016, Mina Kamel, ASL, ETH Zurich, Switzerland
- You can contact the author at <mina.kamel@mavt.ethz.ch>
+ Copyright (c) 2016, Mina Kamel and Inkyu Sa, ASL, ETH Zurich, Switzerland
+ You can contact the author at <mina.kamel@mavt.ethz.ch> or <inkyu.sa@mavt.ethz.ch>
 
  All rights reserved.
 
@@ -205,10 +205,6 @@ void DJIInterface::broadcastCallback()
     return;
   }
 
-  static int counter = 0;
-  static double max_dt = 0.0;
-  ros::WallTime t1 = ros::WallTime::now();
-
   ROS_INFO_ONCE("Received broadcast data");
   DJI::onboardSDK::BroadcastData data;
   dji_comm_.getBroadcastData(&data);
@@ -221,18 +217,6 @@ void DJIInterface::broadcastCallback()
   updateControlMode(data);
 
   ros::WallTime t2 = ros::WallTime::now();
-
-  double dt = (t2-t1).toSec();
-    if(dt > max_dt){
-      max_dt = dt;
-    }
-    counter++;
-
-    if(counter > 100){
-      std::cout << "broadcast dt: " << dt*1e3 << "\t max dt: " << max_dt*1e3 << std::endl;
-      max_dt = 0;
-      counter = 0;
-    }
 
 }
 
@@ -390,13 +374,6 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
     return;
   }
 
-//  std::cout << "data.rc.roll: " << data.rc.roll << std::endl;
-//  std::cout << "data.rc.pitch: " << data.rc.pitch << std::endl;
-//  std::cout << "data.rc.throttle: " << data.rc.throttle << std::endl;
-//  std::cout << "data.rc.yaw: " << data.rc.yaw << std::endl;
-//  std::cout << "data.rc.mode: " << data.rc.mode << std::endl;
-//  std::cout << "data.rc.gear: " << data.rc.gear << std::endl;
-
   sensor_msgs::Joy msg;
 
   msg.header.frame_id = frame_id_;
@@ -478,28 +455,11 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
   bool rc_serial_enabled = data.rc.gear < int(-kRCStickMaxValue/2);
   bool external_control_mode = data.ctrlInfo.deviceStatus == DJI::onboardSDK::Flight::DEVICE_SDK;
 
- // std::cout << "external_control_mode: " << int(data.ctrlInfo.deviceStatus) << std::endl;
- // std::cout << "rc_serial_enabled: " << rc_serial_enabled << std::endl;
-
   if(rc_mode_F){
     if (!external_control_mode) {
       dji_comm_.setExternalControl(true);
     }
   }
-
-//  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
-//  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
-
-//  if (rc_mode_F & rc_serial_enabled) {
-//    if (!external_control_mode) {
-//      dji_comm_.setExternalControl(true);
-//    }
-//  }
-
-  // if serial is disabled and external control is enabled, no external control
-//  if (!rc_serial_enabled & external_control_mode) {
-//    dji_comm_.setExternalControl(false);
-//  }
 }
 
 int DJIInterface::getFrequencyValue(int freq_hz)
