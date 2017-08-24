@@ -1,0 +1,80 @@
+ capabilities: [
+  [
+   "Core",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Core`` group provides basic functionality to operate the robot"
+  ],
+  [
+   "Sensor Fusion",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Sensor Fusion`` group provides ..."
+  ],
+  [
+   "Sensor",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Sensor`` group provides ..."
+  ],
+  [
+   "Camera",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Camera`` group provides ..."
+  ],
+  [
+   "Computer Vision",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Camera`` group provides ..."
+  ],
+  [
+   "Remote",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Remote`` group provides ..."
+  ],
+  [
+   "Misc",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Misc`` group provides ..."
+  ],
+  [
+   "Sensor Fusion DBG",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``Misc`` group provides ..."
+  ],
+  [
+   "FCU DBG",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "The ``FCU DBG`` group provides nodes and debugging nodes related to the Flight Control Unit"
+  ],
+  [
+   "Vicon",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "Vicon"
+  ],
+  [
+   "Okvis",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "Okvis"
+  ],
+  [
+   "Rovio",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "Rovio"
+  ],
+  [
+   "Obstacle Avoidance",
+   "core",
+   "images/crystal_clear_filesystem_desktop",
+   "High Level"
+  ]
+]
