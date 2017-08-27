@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2016, Mina Kamel, ASL, ETH Zurich, Switzerland
- You can contact the author at <mina.kamel@mavt.ethz.ch>
+ Copyright (c) 2016, Mina Kamel and Inkyu Sa, ASL, ETH Zurich, Switzerland
+ You can contact the author at <mina.kamel@mavt.ethz.ch> or <inkyu.sa@mavt.ethz.ch>
 
  All rights reserved.
 
@@ -54,7 +54,7 @@ class DJIInterface
   static constexpr double kGravity = 9.807;
   static constexpr double kRCStickMaxValue = 10000.0;
   static const std::string kScreenPrefix;
-  static constexpr double kDefaultThrustConstant = 1.2013;
+  static constexpr double kDefaultThrustConstant = 1.667;
 
   enum FlightDataType
   {

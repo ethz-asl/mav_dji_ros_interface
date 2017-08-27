@@ -22,6 +22,7 @@
 #include "dji_sdk_lib/DJI_API.h"
 
 #include "dji_sdk_lib/DJI_Logging.h"
+//#include <iostream>
 
 using namespace DJI::onboardSDK;
 
@@ -39,6 +40,7 @@ void CoreAPI::sendData(unsigned char *buf)
 #endif
 
   ans = serialDevice->send(buf, pHeader->length);
+  //std::cout<<"sendData(len)="<<ans<<std::endl;
   if (ans == 0)
     API_LOG(serialDevice, STATUS_LOG, "Port not send");
   if (ans == (size_t)-1)
@@ -263,6 +265,7 @@ void CoreAPI::readPoll()
   int read_len;
   uint8_t buf[BUFFER_SIZE];
   read_len = serialDevice->readall(buf, BUFFER_SIZE);
+  //std::cout<<"read_len="<<read_len<<std::endl;
 #ifdef API_BUFFER_DATA
   onceRead = read_len;
   totalRead += onceRead;

@@ -1,0 +1,52 @@
+gyroscopes:
+  label: /imu/gyro_raw
+  noise_model:
+    type: white-brownian
+    noise_density: 0.0018685
+    bandwidth: 1000.0
+    bias_noise_density: 2.664e-05
+  intrinsic_model:
+    type: scale-misalignment-gsensitivity
+    b:
+      cols: 1
+      rows: 3
+      data: [ 0.0,
+              0.0,
+              0.0 ]
+    M:
+      cols: 3
+      rows: 3
+      data: [ 1.00126990453, 0.00871727578562, 0.000628594413718,
+              -0.00862136029208, 1.00397455412, 0.00380869127992,
+              -0.000361878871321, -0.0043705878082, 1.00006974921 ]
+    Ma:
+      cols: 3
+      rows: 3
+      data: [ -3.11244659391e-05, 0.00076556080035, 0.000120758159389,
+              -0.000215407011169, -0.000451384770863, -8.37688674756e-05,
+              7.50146762877e-05, -0.000161838416777, 2.44519982667e-05 ]
+    delay: -0.0114733844647
+    range: 1000.0
+accelerometers:
+  label: /imu/accel_raw
+  noise_model:
+    type: white-brownian
+    noise_density: 0.001865
+    bandwidth: 1000.0
+    bias_noise_density: 0.0004339
+  intrinsic_model:
+    type: scale-misalignment
+    b:
+      cols: 1
+      rows: 3
+      data: [ 0.0,
+              0.0,
+              0.0 ]
+    M:
+      cols: 3
+      rows: 3
+      data: [ 0.981100121868, 0.0, 0.0,
+              -0.0214868055182, 0.986605449243, 0.0,
+              0.00241560866803, -0.0288757670912, 0.985232915586 ]
+    delay: -0.00707015599715
+    range: 1000.0

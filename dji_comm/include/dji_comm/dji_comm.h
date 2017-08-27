@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2016, Mina Kamel, ASL, ETH Zurich, Switzerland
- You can contact the author at <mina.kamel@mavt.ethz.ch>
+ Copyright (c) 2016, Mina Kamel and Inkyu Sa, ASL, ETH Zurich, Switzerland
+ You can contact the author at <mina.kamel@mavt.ethz.ch> or <inkyu.sa@mavt.ethz.ch>
 
  All rights reserved.
 
@@ -98,12 +98,15 @@ class DJIComm
   void setBroadcastFrequency(uint8_t* freq);
 
  private:
+  static constexpr int kSerialTimeout_ms = 100;
   //ros
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
 
   std::shared_ptr<DJISerialPort> serial_;
   pthread_t communication_thread_;
+//  pthread_t send_communication_thread_;
+
 
   // callbacks
   std::function<void()> broadcast_callback_;
@@ -125,6 +128,7 @@ class DJIComm
   static void missionStatusCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
   static void missionEventCallback(DJI::onboardSDK::CoreAPI *coreAPI, DJI::onboardSDK::Header *header, void *userData);
 
+//  static void* mainReadCommunicationThread(void* core_api);
   static void* mainCommunicationThread(void* core_api);
 
 };

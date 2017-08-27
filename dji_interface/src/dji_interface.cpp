@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2016, Mina Kamel, ASL, ETH Zurich, Switzerland
- You can contact the author at <mina.kamel@mavt.ethz.ch>
+ Copyright (c) 2016, Mina Kamel and Inkyu Sa, ASL, ETH Zurich, Switzerland
+ You can contact the author at <mina.kamel@mavt.ethz.ch> or <inkyu.sa@mavt.ethz.ch>
 
  All rights reserved.
 
@@ -108,9 +108,9 @@ void DJIInterface::loadParameters()
     //IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
-    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
+    broadcast_frequency_[3] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     //magnetometer
     broadcast_frequency_[6] = getFrequencyValue(magnetometer_update_rate);
@@ -128,9 +128,9 @@ void DJIInterface::loadParameters()
     //IMU
     broadcast_frequency_[1] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[2] = getFrequencyValue(imu_update_rate);
-    broadcast_frequency_[3] = getFrequencyValue(imu_update_rate);
     broadcast_frequency_[4] = getFrequencyValue(imu_update_rate);
     //GPS
+    broadcast_frequency_[3] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[5] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[6] = getFrequencyValue(gps_updae_rate);
     broadcast_frequency_[7] = getFrequencyValue(gps_updae_rate);
@@ -150,8 +150,8 @@ void DJIInterface::loadParameters()
 void DJIInterface::init()
 {
   dji_comm_.init(device_, baudrate_);
-  dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.getFirmwareVersion(&firmware_version_);
+  dji_comm_.activate(&activation_data_, NULL);
   dji_comm_.setBroadcastFrequency(broadcast_frequency_.data());
   dji_comm_.setBroadcastCallback(&DJIInterface::broadcastCallback, this);
 
@@ -162,15 +162,16 @@ void DJIInterface::init()
 
 void DJIInterface::setPublishers()
 {
-  imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 10);
-  rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 10);
-  status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 10);
+  imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 1);
+  rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 1);
+  status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 1);
 }
 
 void DJIInterface::setSubscribers()
 {
   command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
-                                                         &DJIInterface::commandRollPitchYawrateThrustCallback, this);
+                                                         &DJIInterface::commandRollPitchYawrateThrustCallback, this, 
+                                                         ros::TransportHints().tcpNoDelay());
 }
 
 void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg)
@@ -186,10 +187,13 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
   double throttle_cmd = msg->thrust.z*thrust_constant_;
 
-  // zero thrust_cmd will shut off the motors.
-  if(throttle_cmd <= 0){
-    ROS_WARN_STREAM(kScreenPrefix + "Throttle command is negative.. set to minimum");
-    throttle_cmd = 5;
+  if(throttle_cmd < 10){
+    ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is below minimum.. set to minimum");
+    throttle_cmd = 10;
+  }
+  if(throttle_cmd > 95){
+    ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is too high.. set to max");
+    throttle_cmd = 95;
   }
 
   dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd, throttle_cmd);
@@ -205,13 +209,15 @@ void DJIInterface::broadcastCallback()
   DJI::onboardSDK::BroadcastData data;
   dji_comm_.getBroadcastData(&data);
 
-//  std::cout << "firmware_version: " << firmware_version_ << std::endl;
   processIMU(data);
   processRc(data);
   processStatusInfo(data);
   processTimeStamp(data);
 
   updateControlMode(data);
+
+  ros::WallTime t2 = ros::WallTime::now();
+
 }
 
 bool DJIInterface::checkNewData(FlightDataType data_type, const unsigned short msg_flag)
@@ -375,7 +381,7 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
 
   msg.axes.resize(8);
   // axis 0 is pitch
-  msg.axes[0] = -data.rc.pitch / kRCStickMaxValue;
+  msg.axes[0] = data.rc.pitch / kRCStickMaxValue;
   // axis 1 is roll
   msg.axes[1] = -data.rc.roll / kRCStickMaxValue;
   // axis 2 is thrust
@@ -383,7 +389,7 @@ void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
   //axis 3 is yaw
   msg.axes[3] = -data.rc.yaw / kRCStickMaxValue;
   //axis 4 is enable/disable external commands
-  if (data.rc.gear < -kRCStickMaxValue / 2) {
+  if (data.rc.gear < int(-kRCStickMaxValue/2)) {
     msg.axes[4] = 1;
   } else {
     msg.axes[4] = -1;
@@ -446,21 +452,13 @@ void DJIInterface::updateControlMode(const DJI::onboardSDK::BroadcastData& data)
   }
   //if RC is on F mode and serial is enabled, external control should be enabled
   bool rc_mode_F = data.rc.mode == 8000;
-  bool rc_serial_enabled = data.rc.gear < -kRCStickMaxValue / 2;
-  bool external_control_mode = data.ctrlInfo.deviceStatus == 2;
+  bool rc_serial_enabled = data.rc.gear < int(-kRCStickMaxValue/2);
+  bool external_control_mode = data.ctrlInfo.deviceStatus == DJI::onboardSDK::Flight::DEVICE_SDK;
 
-//  printf("data.ctrlInfo.mode: %d \n", data.ctrlInfo.mode);
-//  printf("data.ctrlInfo.devicestatus: %d \n", data.ctrlInfo.deviceStatus);
-
-  if (rc_mode_F & rc_serial_enabled) {
+  if(rc_mode_F){
     if (!external_control_mode) {
       dji_comm_.setExternalControl(true);
     }
-  }
-
-  // if serial is disabled and external control is enabled, no external control
-  if (!rc_serial_enabled & external_control_mode) {
-    dji_comm_.setExternalControl(false);
   }
 }
 

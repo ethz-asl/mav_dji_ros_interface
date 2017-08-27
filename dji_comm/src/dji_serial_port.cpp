@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2016, Mina Kamel, ASL, ETH Zurich, Switzerland
- You can contact the author at <mina.kamel@mavt.ethz.ch>
+ Copyright (c) 2016, Mina Kamel and Inkyu Sa, ASL, ETH Zurich, Switzerland
+ You can contact the author at <mina.kamel@mavt.ethz.ch> or <inkyu.sa@mavt.ethz.ch>
 
  All rights reserved.
 
@@ -103,13 +103,13 @@ void DJISerialPort::wait(int timeout_ms)
 #ifdef __MACH__
   struct timeval curTime;
   gettimeofday(&curTime, NULL);
-  absTimeout.tv_sec = curTime.tv_sec + timeout_ms * 1000;
-  absTimeout.tv_nsec = curTime.tv_usec / 1000;
+  absTimeout.tv_sec = curTime.tv_sec; //+ (curTime.tv_usec*1000 + timeout_ms*1e6)%1e9;
+  absTimeout.tv_nsec = curTime.tv_usec*1000 + timeout_ms*1e6; // - 1e9*(curTime.tv_usec*1000 + timeout_ms*1e6)%1e9;
 #else
   struct timespec curTime;
   clock_gettime(CLOCK_REALTIME, &curTime);
-  absTimeout.tv_sec = curTime.tv_sec + timeout_ms * 1000;
-  absTimeout.tv_nsec = curTime.tv_nsec;
+  absTimeout.tv_sec = curTime.tv_sec;
+  absTimeout.tv_nsec = curTime.tv_nsec + timeout_ms*1e6;
 
 #endif
   pthread_cond_timedwait(&ack_recv_cv_, &ackLock_, &absTimeout);
@@ -255,7 +255,7 @@ bool DJISerialPort::configSerial(int baudrate, char data_bits, char parity_bits,
 
   /* config waiting time & min number of char */
   newtio.c_cc[VTIME] = 1;
-  newtio.c_cc[VMIN] = 1;
+  newtio.c_cc[VMIN] = 18; // from osdk
 
   /* using the raw data mode */
   newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
