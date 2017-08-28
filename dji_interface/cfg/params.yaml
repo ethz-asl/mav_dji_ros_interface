@@ -1,7 +1,10 @@
 device: "/dev/tty.usbserial-A104JS3T"
 app_id: 1040678
 enc_key: "a41335b074411eb3408029cd0955324df2d3b84e5c0d80ed8344ae5c34e05cb2"
-
+thrust_minimum: 10
+thrust_maximum: 100
+thrust_offset: 8.945
+thrust_coefficient: 0.7389
 
 #available freq: 0 1 10 50 100 Hz
 imu_update_rate: 50
