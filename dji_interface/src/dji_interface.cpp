@@ -38,7 +38,10 @@ DJIInterface::DJIInterface(const ros::NodeHandle& nh, const ros::NodeHandle& pri
     : nh_(nh),
       private_nh_(private_nh),
       dji_comm_(nh, private_nh),
-      thrust_constant_(kDefaultThrustConstant),
+      thrust_coefficient_(kDefaultThrustCoefficient),
+      minimum_thrust_(kDefaultMinimumThrust),
+      maximum_thrust_(kDefaultMaximumThrust),
+      thrust_offset_(kDefaultMinimumThrust),
       initialized_(false)
 {
   loadParameters();
@@ -54,7 +57,10 @@ void DJIInterface::loadParameters()
 {
   private_nh_.param<std::string>("frame_id", frame_id_, "dji_interface");
   private_nh_.param<std::string>("device", device_, "/dev/ttyUSB0");
-  private_nh_.param<double>("thrust_constant", thrust_constant_, thrust_constant_);
+  private_nh_.param<double>("thrust_coefficient", thrust_coefficient_, thrust_coefficient_);
+  private_nh_.param<double>("minimum_thrust", minimum_thrust_, minimum_thrust_);
+  private_nh_.param<double>("maximum_thrust", maximum_thrust_, maximum_thrust_);
+  private_nh_.param<double>("thrust_offset", thrust_offset_, thrust_offset_);
   std::cout << "device: " << device_ << std::endl;
   private_nh_.param<int>("baudrate", baudrate_, 921600);
   int app_id;
@@ -185,15 +191,15 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   double roll_cmd = msg->roll*180.0/M_PI;
   double pitch_cmd = -msg->pitch*180.0/M_PI;
   double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
-  double throttle_cmd = msg->thrust.z*thrust_constant_;
+  double throttle_cmd = thrust_offset_ + msg->thrust.z*thrust_coefficient_;
 
-  if(throttle_cmd < 10){
+  if(throttle_cmd < minimum_thrust_){
     ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is below minimum.. set to minimum");
-    throttle_cmd = 10;
+    throttle_cmd = minimum_thrust_;
   }
-  if(throttle_cmd > 95){
+  if(throttle_cmd > maximum_thrust_){
     ROS_WARN_STREAM_THROTTLE(0.1, kScreenPrefix + "Throttle command is too high.. set to max");
-    throttle_cmd = 95;
+    throttle_cmd = maximum_thrust_;
   }
 
   dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd, throttle_cmd);

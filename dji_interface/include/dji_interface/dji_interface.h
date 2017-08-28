@@ -54,7 +54,11 @@ class DJIInterface
   static constexpr double kGravity = 9.807;
   static constexpr double kRCStickMaxValue = 10000.0;
   static const std::string kScreenPrefix;
-  static constexpr double kDefaultThrustConstant = 1.667;
+  static constexpr double kDefaultThrustCoefficient = 0.7389;
+  static constexpr double kDefaultMinimumThrust = 10.0;
+  static constexpr double kDefaultMaximumThrust = 100.0;
+
+
 
   enum FlightDataType
   {
@@ -88,7 +92,10 @@ class DJIInterface
   std::string device_;
   int baudrate_;
 
-  double thrust_constant_;
+  double thrust_coefficient_;
+  double minimum_thrust_;
+  double maximum_thrust_;
+  double thrust_offset_;
 
   void loadParameters();
   void init();
