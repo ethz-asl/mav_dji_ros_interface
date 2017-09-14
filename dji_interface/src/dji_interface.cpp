@@ -483,4 +483,4 @@ switch (freq_hz) {
 }
 }
 
-} /* namespace mav_disturbance_observer */
+} /* namespace dji_interface */
