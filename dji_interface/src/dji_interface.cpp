@@ -171,6 +171,8 @@ void DJIInterface::setSubscribers()
 {
   command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
                                                          &DJIInterface::commandRollPitchYawrateThrustCallback, this);
+  command_deltaxy_yawrate_zvelocity_sub_ = nh_.subscribe(mav_msgs::default_topics::COMMAND_DELTAXY_YAWRATE_ZVELOCITY, 1,
+    &DJIInterface::commandDeltaXYYawrateZVelocityCallback, this);
 }
 
 void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg)
@@ -195,6 +197,19 @@ void DJIInterface::commandRollPitchYawrateThrustCallback(const mav_msgs::RollPit
   dji_comm_.setRollPitchYawrateThrust(roll_cmd, pitch_cmd, yaw_rate_cmd, throttle_cmd);
 }
 
+void DJIInterface::commandDeltaXYYawrateZVelocityCallback(const mav_msgs::DeltaXYYawrateZVelocityConstPtr& msg){
+  if(!initialized_){
+    return;
+  }
+  ROS_INFO_STREAM_ONCE(kScreenPrefix + "Received first horizontal position yawrate vertical velocity command msg");
+  
+    double deltaX_cmd = msg->deltaX;
+    double deltaY_cmd = -msg->deltaY;
+    double yaw_rate_cmd = -msg->yaw_rate*180.0/M_PI;
+    double zVelocity = msg->zVelocity;
+  
+    dji_comm_.setDeltaXYYawrateZVelocity(deltaX_cmd, deltaY_cmd, yaw_rate_cmd, zVelocity);
+}
 void DJIInterface::broadcastCallback()
 {
   if(!initialized_){

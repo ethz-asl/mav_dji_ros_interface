@@ -31,6 +31,7 @@
 
 #include <ros/ros.h>
 #include <mav_msgs/RollPitchYawrateThrust.h>
+#include <mav_msgs/DeltaXYYawrateZVelocity.h>
 #include <mav_msgs/default_topics.h>
 #include <mav_msgs/Status.h>
 #include <sensor_msgs/Imu.h>
@@ -80,9 +81,11 @@ class DJIInterface
 
   //ros subscribers
   ros::Subscriber command_roll_pitch_yawrate_thrust_sub_;
+  ros::Subscriber command_deltaxy_yawrate_zvelocity_sub_;
 
   //callbacks
   void commandRollPitchYawrateThrustCallback(const mav_msgs::RollPitchYawrateThrustConstPtr& msg);
+  void commandDeltaXYYawrateZVelocityCallback(const mav_msgs::DeltaXYYawrateZVelocityConstPtr& msg);
 
   std::string frame_id_;
   std::string device_;

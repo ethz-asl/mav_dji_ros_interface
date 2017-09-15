@@ -109,6 +109,13 @@ void DJIComm::setRollPitchYawrateThrust(double roll_cmd, double pitch_cmd, doubl
   std::cout << "dt: " << (t2 - t1).toSec() << std::endl;
 }
 
+void DJIComm::setDeltaXYYawrateZVelocity(double deltaX_cmd, double deltaY_cmd, double yaw_rate, double zVelocity){
+  ros::WallTime t1 = ros::WallTime::now();
+  flight_ptr_->setMovementControl(0x8B, deltaX_cmd, deltaY_cmd, zVelocity, yaw_rate);
+  ros::WallTime t2 = ros::WallTime::now();
+  std::cout << "dt: " << (t2 - t1).toSec() << std::endl;
+}
+
 void DJIComm::setBroadcastFrequency(uint8_t* freq){
   core_api_ptr_->setBroadcastFreq(freq);
 }
