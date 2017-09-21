@@ -1,4 +1,4 @@
-device: "/dev/tty.usbserial-A104JS3T"
+device: "/dev/ttyUSB0"
 app_id: 1040678
 enc_key: "a41335b074411eb3408029cd0955324df2d3b84e5c0d80ed8344ae5c34e05cb2"
 thrust_minimum: 10

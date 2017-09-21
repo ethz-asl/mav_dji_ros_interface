@@ -1,0 +1,24 @@
+<launch>
+  <arg name="mav_name" default="raven"/>
+  <arg name="namespace" default="$(arg mav_name)" />
+  <arg name="camera"       default="camera" />
+  <rosparam file="$(find dji_interface)/cfg/$(arg mav_name)/capabilities.yaml"/>
+  
+  <group ns="$(arg namespace)" >
+
+  <?ignore
+    =========================================================
+    Rovio - Needs to be started separately to allow Cuckoo time to converge
+    =========================================================
+  ?>
+    <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
+      <param name="filter_config" value="$(find dji_interface)/cfg/$(arg mav_name)/rovio_filter.info" />
+      <param name="camera0_config" value="$(find dji_interface)/cfg/$(arg mav_name)/rovio_cam0.yaml" /> 
+      <remap from="cam0/image_raw" to="$(arg camera)/fisheye/image_raw"/>
+      <remap from="imu0" to="$(arg camera)/imu/data_raw"/>
+      <param name="world_frame" value="odom"/>
+      <param name="capability_group" value="Rovio" />
+    </node>
+
+  </group>
+</launch>

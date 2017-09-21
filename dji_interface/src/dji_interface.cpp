@@ -171,6 +171,7 @@ void DJIInterface::setPublishers()
   imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 1);
   rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 1);
   status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 1);
+  gps_pub_ = nh_.advertise<sensor_msgs::NavSatFix>("dji_ros/gps", 1);
 }
 
 void DJIInterface::setSubscribers()
@@ -372,6 +373,7 @@ void DJIInterface::processIMU(const DJI::onboardSDK::BroadcastData& data)
   imu_pub_.publish(msg);
 
 }
+
 
 void DJIInterface::processRc(const DJI::onboardSDK::BroadcastData& data)
 {

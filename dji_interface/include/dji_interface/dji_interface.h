@@ -35,6 +35,7 @@
 #include <mav_msgs/Status.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Joy.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include <Eigen/Eigen>
 
@@ -80,6 +81,7 @@ class DJIInterface
   //ros publishers
   ros::Publisher imu_pub_;
   ros::Publisher rc_pub_;
+  ros::Publisher gps_pub_;
   ros::Publisher status_pub_;
 
   //ros subscribers

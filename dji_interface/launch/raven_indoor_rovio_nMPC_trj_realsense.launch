@@ -44,21 +44,28 @@
     <arg name="fisheye_fps"       default="30" />
     <arg name="depth_fps"         default="30" />
     <arg name="fisheye_strobe"    default="1" />
-    <arg name="fisheye_external_trigger"    default="0" />
+    <arg name="fisheye_external_trigger"    default="1" />
     <arg name="enable_imu"    default="true" />
 
 
     <param name="$(arg camera)/driver/mode"              type="str"  value="$(arg mode)" />
     <param name="$(arg camera)/driver/color_fps"         type="int"  value="$(arg color_fps)" />
     <param name="$(arg camera)/driver/fisheye_fps"       type="int"  value="$(arg fisheye_fps)" />
-    <param name="$(arg camera)/driver/fisheye_subsample_fps"   type="int"  value="2" />
     <param name="$(arg camera)/driver/depth_fps"       type="int"  value="$(arg depth_fps)" />
-    <param name="$(arg camera)/driver/fisheye_strobe"    type="int"  value="$(arg fisheye_strobe)" />
-    <param name="$(arg camera)/driver/fisheye_external_trigger"    type="int"  value="$(arg fisheye_external_trigger)" />
-    <param name="$(arg camera)/driver/enable_imu"     value="$(arg enable_imu)" />
-    <param name="$(arg camera)/driver/enable_depth"     value="false" />
-    <param name="$(arg camera)/driver/enable_color"     value="false" />
-    <param name="$(arg camera)/driver/enable_fisheye"     value="true" />
+    <param name="$(arg camera)/driver/fisheye_subsample_fps"   type="int"  value="2" />
+    <param name="$(arg camera)/driver/color_subsample_fps"   type="int"  value="3" />
+    <param name="$(arg camera)/driver/ir_subsample_fps"   type="int"  value="3" />
+    <param name="$(arg camera)/driver/ir2_strobe"    type="int"  value="$(arg fisheye_strobe)" />"     value="$(arg enable_imu)" />
+    <param name="$(arg camera)/driver/depth_width"     type="int" value="640" />
+    <param name="$(arg camera)/driver/depth_height"     type="int" value="480" />
+    <param name="$(arg camera)/driver/color_width"     type="int" value="1920" />
+    <param name="$(arg camera)/driver/color_height"     type="int" value="1080" />
+    <param name="$(arg camera)/driver/enable_depth"     type="bool" value="false" />
+    <param name="$(arg camera)/driver/enable_ir"     type="bool" value="false" />
+    <param name="$(arg camera)/driver/enable_ir2"     type="bool" value="false" />
+    <param name="$(arg camera)/driver/enable_color"     type="bool" value="true" />
+    <param name="$(arg camera)/driver/enable_fisheye"     type="bool" value="true" />
+
     <!-- Refer to the Wiki http://wiki.ros.org/realsense_camera for list of supported parameters -->
     <group ns="$(arg camera)">
       <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/>
@@ -70,20 +77,6 @@
         <arg name="usb_port_id"  value="$(arg usb_port_id)" />
       </include>
     </group>
-
-  <?ignore
-    =========================================================
-                        Rovio
-    =========================================================
-  ?>
-    <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
-      <param name="filter_config" value="$(find dji_interface)/cfg/$(arg mav_name)/rovio_filter.info" />
-      <param name="camera0_config" value="$(find dji_interface)/cfg/$(arg mav_name)/rovio_cam0.yaml" /> 
-      <remap from="cam0/image_raw" to="$(arg camera)/fisheye/image_raw"/>
-      <remap from="imu0" to="$(arg camera)/imu/data_raw"/>
-      <param name="world_frame" value="odom"/>
-      <param name="capability_group" value="Rovio" />
-    </node>
 
   <?ignore
     =========================================================
