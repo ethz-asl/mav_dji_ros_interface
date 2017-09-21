@@ -3,7 +3,7 @@
   <arg name="namespace" default="$(arg mav_name)"/>
   <group ns="$(arg namespace)">
     <node name="dji_interface" pkg="dji_interface" type="dji_interface_node" respawn="true" clear_params="true" output="screen">
-      <rosparam file="$(find dji_interface)/cfg/params.yaml"/>
+      <rosparam file="$(find dji_interface)/cfg/raven/dji_interface_params.yaml"/>
     </node>
   </group>
 </launch>
