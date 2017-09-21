@@ -84,14 +84,14 @@ void DJIInterface::loadParameters()
 
   // load packets freq
   int imu_update_rate;
-  int gps_updae_rate;
+  int gps_update_rate;
   int time_stamp_update_rate;
   int magnetometer_update_rate;
   int rc_update_rate;
   int status_update_rate;
 
   private_nh_.param<int>("imu_update_rate", imu_update_rate, DJI::onboardSDK::BROADCAST_FREQ_100HZ);
-  private_nh_.param<int>("gps_updae_rate", gps_updae_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
+  private_nh_.param<int>("gps_update_rate", gps_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
   private_nh_.param<int>("time_stamp_update_rate", time_stamp_update_rate, DJI::onboardSDK::BROADCAST_FREQ_1HZ);
   private_nh_.param<int>("magnetometer_update_rate", magnetometer_update_rate, DJI::onboardSDK::BROADCAST_FREQ_10HZ);
   private_nh_.param<int>("rc_update_rate", rc_update_rate, DJI::onboardSDK::BROADCAST_FREQ_50HZ);
@@ -110,7 +110,7 @@ void DJIInterface::loadParameters()
     freq[3] = getFrequencyValue(imu_update_rate);
     freq[4] = getFrequencyValue(imu_update_rate);
     //GPS
-    freq[5] = getFrequencyValue(gps_updae_rate);
+    freq[5] = getFrequencyValue(gps_update_rate);
     //magnetometer
     freq[6] = getFrequencyValue(magnetometer_update_rate);
     //rc data
@@ -130,9 +130,9 @@ void DJIInterface::loadParameters()
     freq[3] = getFrequencyValue(imu_update_rate);
     freq[4] = getFrequencyValue(imu_update_rate);
     //GPS
-    freq[5] = getFrequencyValue(gps_updae_rate);
-    freq[6] = getFrequencyValue(gps_updae_rate);
-    freq[7] = getFrequencyValue(gps_updae_rate);
+    freq[5] = getFrequencyValue(gps_update_rate);
+    freq[6] = getFrequencyValue(gps_update_rate);
+    freq[7] = getFrequencyValue(gps_update_rate);
     //magnetometer
     freq[8] = getFrequencyValue(magnetometer_update_rate);
     //rc data
