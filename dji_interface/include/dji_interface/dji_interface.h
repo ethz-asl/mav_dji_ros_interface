@@ -35,11 +35,13 @@
 #include <mav_msgs/Status.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Joy.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include <Eigen/Eigen>
 
 #include <dji_comm/dji_comm.h>
-
+#define C_PI (double)3.141592653589793
+ 
 namespace dji_interface {
 
 class DJIInterface
@@ -81,6 +83,7 @@ class DJIInterface
   ros::Publisher imu_pub_;
   ros::Publisher rc_pub_;
   ros::Publisher status_pub_;
+  ros::Publisher gps_pub_;
 
   //ros subscribers
   ros::Subscriber command_roll_pitch_yawrate_thrust_sub_;
@@ -115,7 +118,7 @@ class DJIInterface
   void processRc(const DJI::onboardSDK::BroadcastData& data);
   void processTimeStamp(const DJI::onboardSDK::BroadcastData& data);
   void processStatusInfo(const DJI::onboardSDK::BroadcastData& data);
-
+  void processGPS(const DJI::onboardSDK::BroadcastData& data);
 
   void updateControlMode(const DJI::onboardSDK::BroadcastData& data);
 

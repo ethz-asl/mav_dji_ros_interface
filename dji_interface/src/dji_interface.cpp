@@ -171,6 +171,7 @@ void DJIInterface::setPublishers()
   imu_pub_ = nh_.advertise<sensor_msgs::Imu>(mav_msgs::default_topics::IMU, 1);
   rc_pub_ = nh_.advertise<sensor_msgs::Joy>(mav_msgs::default_topics::RC, 1);
   status_pub_ = nh_.advertise<mav_msgs::Status>(mav_msgs::default_topics::STATUS, 1);
+  gps_pub_ = nh_.advertise<sensor_msgs::NavSatFix>("gps", 1); //Hard-coded topic name, change this later.
 }
 
 void DJIInterface::setSubscribers()
@@ -217,6 +218,7 @@ void DJIInterface::broadcastCallback()
 
   processIMU(data);
   processRc(data);
+  processGPS(data);
   processStatusInfo(data);
   processTimeStamp(data);
 
@@ -429,6 +431,24 @@ void DJIInterface::processTimeStamp(const DJI::onboardSDK::BroadcastData& data)
   }
 
 }
+
+void DJIInterface::processGPS(const DJI::onboardSDK::BroadcastData& data)
+{
+  if (!checkNewData(FlightDataType::GPSLocation, data.dataFlag)) {
+    // no new timestamp data
+    return;
+  }
+  sensor_msgs::NavSatFix gps_msg;
+  // Update gps mesage
+  gps_msg.header.frame_id = "/world";
+  gps_msg.header.stamp = ros::Time::now();  //todo(fmina) time sync
+  gps_msg.latitude = data.pos.latitude * 180.0 / C_PI;
+  gps_msg.longitude = data.pos.longitude * 180.0 / C_PI;
+  gps_msg.altitude = data.pos.height; //data.pos.altitude;
+  gps_pub_.publish(gps_msg);
+
+}
+
 void DJIInterface::processStatusInfo(const DJI::onboardSDK::BroadcastData& data)
 {
   if (!checkNewData(FlightDataType::Status, data.dataFlag)) {
